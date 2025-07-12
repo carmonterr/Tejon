@@ -1,0 +1,22 @@
+# Ignora dependencias
+node_modules/
+
+# Ignora salidas de compilación
+dist/
+build/
+coverage/
+.vite/
+
+# Ignora archivos del editor y entorno
+.vscode/
+.env
+.env.*
+
+# Ignora lockfiles y logs
+*.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Ignora archivos que no deberían formatearse
+public/

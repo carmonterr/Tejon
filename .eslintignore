@@ -1,0 +1,23 @@
+# Ignora dependencias
+node_modules/
+
+# Ignora carpetas de salida
+dist/
+build/
+coverage/
+.vite/
+
+# Ignora archivos de entorno
+.env
+.env.* 
+
+# Ignora archivos de configuración del editor
+.vscode/
+
+# Ignora lockfiles temporales
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Si usas logs
+*.log

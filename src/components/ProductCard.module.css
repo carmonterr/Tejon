@@ -1,0 +1,101 @@
+.card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  background-color: white;
+  transition: box-shadow 0.3s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mainImg {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.rating {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.modal {
+  position: relative;
+  background: white;
+  padding: 1rem;
+  max-width: 600px;
+  margin: auto;
+  border-radius: 10px;
+}
+
+.overlay {
+  background: rgba(0, 0, 0, 0.75);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.modalContent {
+  text-align: center;
+}
+
+.imageNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.zoomImg {
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
+}
+
+.thumbnailRow {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.thumb.active {
+  border-color: #333;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+}
+.name {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.name:hover {
+  color: #007bff;
+}
+
