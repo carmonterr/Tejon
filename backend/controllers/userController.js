@@ -351,7 +351,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 
   await user.save()
 
-  const resetUrl = `http://localhost:5173/reset-password/${rawToken}`
+  const resetUrl = `${process.env.CLIENT_URL}/reset-password/${rawToken}`
 
   console.log('🔗 Enlace completo de recuperación:', resetUrl)
 

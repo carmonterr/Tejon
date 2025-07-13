@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import axios from 'axios'
+
+import api from '../../utils/axios' // Importa tu instancia configurada con baseURL
 
 // Estado inicial
 const initialState = {
@@ -9,28 +10,23 @@ const initialState = {
 }
 
 // Thunk para cargar usuario desde token
-export const loadUserFromToken = createAsyncThunk(
-  'user/loadUserFromToken',
-  async (_, thunkAPI) => {
-    try {
-      const token = localStorage.getItem('token')
-      if (!token) throw new Error('No hay token')
+export const loadUserFromToken = createAsyncThunk('user/loadUserFromToken', async (_, thunkAPI) => {
+  try {
+    const token = localStorage.getItem('token')
+    if (!token) throw new Error('No hay token')
 
-      const res = await axios.get('http://localhost:5000/api/users/profile', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    const res = await api.get('/users/profile', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
 
-      return { ...res.data, token }
-    } catch (err) {
-      // Limpiar token si no es válido o el usuario no existe
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      return thunkAPI.rejectWithValue(
-        err.response?.data?.message || 'Error al cargar perfil'
-      )
-    }
+    return { ...res.data, token }
+  } catch (err) {
+    // Limpiar token si no es válido o el usuario no existe
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    return thunkAPI.rejectWithValue(err.response?.data?.message || 'Error al cargar perfil')
   }
-)
+})
 
 // Slice de usuario
 const userSlice = createSlice({
@@ -81,4 +77,3 @@ const userSlice = createSlice({
 
 export const { loginSuccess, logout } = userSlice.actions
 export default userSlice.reducer
-

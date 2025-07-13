@@ -1,7 +1,8 @@
 // src/redux/slices/productSlice.js
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import axios from 'axios'
+
+import api from '../../utils/axios'
 
 // 🔍 Backend paginado + filtros
 export const fetchProducts = createAsyncThunk(
@@ -10,7 +11,7 @@ export const fetchProducts = createAsyncThunk(
     try {
       const { search = '', categoria = '', sort = 'newest', page = 1, limit = 8 } = params
 
-      const res = await axios.get('http://localhost:5000/api/products', {
+      const res = await api.get('/products', {
         params: { search, categoria, sort, page, limit },
       })
 

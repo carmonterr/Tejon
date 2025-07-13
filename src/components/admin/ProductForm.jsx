@@ -14,9 +14,10 @@ import {
   RadioGroup,
   Grid,
 } from '@mui/material'
-import axios from 'axios'
+
 import { useParams, useNavigate } from 'react-router-dom'
 import { uploadImage } from '../../utils/uploadImage'
+import api from '../../utils/axios'
 
 const tallas = [35, 36, 37, 38, 39, 40]
 const categorias = ['Juvenil', 'Dama', 'Señorial']
@@ -45,7 +46,7 @@ const ProductForm = () => {
     if (editing) {
       const fetchProduct = async () => {
         try {
-          const { data } = await axios.get(`http://localhost:5000/api/products/${id}`)
+          const { data } = await api.get(`/products/${id}`)
           setProductData(data)
           if (Array.isArray(data.imagen)) {
             const urls = data.imagen.map((img) => img.url || img)
@@ -104,10 +105,10 @@ const ProductForm = () => {
       }
 
       if (editing) {
-        await axios.put(`http://localhost:5000/api/products/${id}`, payload, config)
+        await api.put(`/products/${id}`, payload, config)
         alert('✅ Producto actualizado correctamente')
       } else {
-        await axios.post('http://localhost:5000/api/products', payload, config)
+        await api.post('/products', payload, config)
         alert('✅ Producto creado correctamente')
       }
 
