@@ -42,7 +42,8 @@ const ProductPage = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const { data } = await axios.get(`http://localhost:5000/api/products/${id}`)
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/products/${id}`)
+
       setProduct(data)
       document.title = `${data.nombre} | Tienda MERN`
 
@@ -61,9 +62,12 @@ const ProductPage = () => {
         const token = localStorage.getItem('token')
         if (!token) return
 
-        const { data } = await axios.get(`http://localhost:5000/api/products/${id}/can-review`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_API_URL}/products/${id}/can-review`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
 
         setPuedeOpinar(data.canReview)
       } catch (err) {
@@ -138,7 +142,7 @@ const ProductPage = () => {
       }
 
       await axios.post(
-        `http://localhost:5000/api/products/${product._id}/reviews`,
+        `${import.meta.env.VITE_API_URL}/products/${product._id}/reviews`,
         { rating, comentario, imagenCliente: imagenUrl },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -149,7 +153,8 @@ const ProductPage = () => {
       setImagenCliente(null)
       setPreview(null)
 
-      const { data } = await axios.get(`http://localhost:5000/api/products/${id}`)
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/products/${id}`)
+
       setProduct(data)
     } catch (error) {
       toast.error(error.response?.data?.message || 'Error al enviar opinión')
@@ -336,9 +341,10 @@ const ProductPage = () => {
                   try {
                     const token = localStorage.getItem('token')
                     await axios.delete(
-                      `http://localhost:5000/api/products/${product._id}/reviews/${review._id}`,
+                      `${import.meta.env.VITE_API_URL}/products/${product._id}/reviews/${review._id}`,
                       { headers: { Authorization: `Bearer ${token}` } }
                     )
+
                     toast.success('Opinión eliminada')
                     const { data } = await axios.get(
                       `http://localhost:5000/api/products/${product._id}`
