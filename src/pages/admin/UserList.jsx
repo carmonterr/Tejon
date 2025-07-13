@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   Typography,
   Table,
@@ -20,108 +20,107 @@ import {
   TextField,
   InputAdornment,
   CircularProgress,
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import SearchIcon from '@mui/icons-material/Search';
-import Pagination from '@mui/material/Pagination';
-import { useForm } from 'react-hook-form';
-import axios from 'axios';
+} from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
+import SearchIcon from '@mui/icons-material/Search'
+import Pagination from '@mui/material/Pagination'
+import { useForm } from 'react-hook-form'
+
+import API from '../../api/axios'
 
 const UserList = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [editUser, setEditUser] = useState(null);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [editUser, setEditUser] = useState(null)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm()
 
   const fetchUsers = async (pageNumber = 1, searchQuery = '') => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.get(`${import.meta.env.VITE_API_URL}/users`)
-, {
-        headers: { Authorization: `Bearer ${token}` },
+      const token = localStorage.getItem('token')
+      const { data } = await API.get('/users', {
         params: {
           page: pageNumber,
           limit: 5,
           search: searchQuery,
         },
-      });
+      })
 
-      const usersArray = Array.isArray(data.users) ? data.users : [];
-      setUsers(usersArray);
-      setPage(Number(data.page) || 1);
-      setTotalPages(Number(data.pages) || 1);
+      const usersArray = Array.isArray(data.users) ? data.users : []
+      setUsers(usersArray)
+      setPage(Number(data.page) || 1)
+      setTotalPages(Number(data.pages) || 1)
     } catch (err) {
-      console.error('⛔ Error al obtener usuarios:', err);
-      setUsers([]);
-      setPage(1);
-      setTotalPages(1);
+      console.error('⛔ Error al obtener usuarios:', err)
+      setUsers([])
+      setPage(1)
+      setTotalPages(1)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchUsers(page, search);
-  }, [page, search]);
+    fetchUsers(page, search)
+  }, [page, search])
 
   const handlePageChange = (event, value) => {
-    setPage(value);
-  };
+    setPage(value)
+  }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Eliminar este usuario?')) return;
+    if (!window.confirm('¿Eliminar este usuario?')) return
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/users/${id}`, {
+      const token = localStorage.getItem('token')
+      await API.delete(`/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchUsers(page, search); // Recargar usuarios actuales
+      })
+      fetchUsers(page, search) // Recargar usuarios actuales
     } catch (err) {
-      console.error('⛔ Error al eliminar usuario:', err);
+      console.error('⛔ Error al eliminar usuario:', err)
     }
-  };
+  }
 
   const toggleAdmin = async (user) => {
     try {
-      const token = localStorage.getItem('token');
-      const updated = { ...user, isAdmin: !user.isAdmin };
-      await axios.put(`http://localhost:5000/api/users/${user._id}`, updated, {
+      const token = localStorage.getItem('token')
+      const updated = { ...user, isAdmin: !user.isAdmin }
+      await API.put(`/users/${user._id}`, updated, {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchUsers(page, search);
+      })
+      fetchUsers(page, search)
     } catch (err) {
-      console.error('⛔ Error al cambiar rol:', err);
+      console.error('⛔ Error al cambiar rol:', err)
     }
-  };
+  }
 
   const openEditModal = (user) => {
-    setEditUser(user);
-    reset(user);
-  };
+    setEditUser(user)
+    reset(user)
+  }
 
   const handleEditSubmit = async (data) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/api/users/${editUser._id}`, data, {
+      const token = localStorage.getItem('token')
+      await API.put(`/users/${editUser._id}`, data, {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      setEditUser(null);
-      fetchUsers(page, search);
+      })
+      setEditUser(null)
+      fetchUsers(page, search)
     } catch (err) {
-      console.error('⛔ Error al actualizar usuario:', err);
+      console.error('⛔ Error al actualizar usuario:', err)
     }
-  };
+  }
 
   return (
     <Box>
@@ -135,8 +134,8 @@ const UserList = () => {
         fullWidth
         value={search}
         onChange={(e) => {
-          setSearch(e.target.value);
-          setPage(1);
+          setSearch(e.target.value)
+          setPage(1)
         }}
         sx={{ mb: 2 }}
         InputProps={{
@@ -257,7 +256,7 @@ const UserList = () => {
         </DialogActions>
       </Dialog>
     </Box>
-  );
-};
+  )
+}
 
-export default UserList;
+export default UserList
