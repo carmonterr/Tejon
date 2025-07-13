@@ -68,10 +68,9 @@ const ProductList = () => {
 
     try {
       const token = localStorage.getItem('token') // Asegúrate de que el token esté guardado
-
-      await axios.delete(`http://localhost:5000/api/products/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/products/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Envía el token aquí si el backend lo exige
+          Authorization: `Bearer ${token}`,
         },
       })
 

@@ -8,6 +8,7 @@ const Dashboard = () => {
   const [usersCount, setUsersCount] = useState(0)
   const [orderStats, setOrderStats] = useState({ totalPedidos: 0, totalVentas: 0 })
   const [loading, setLoading] = useState(true)
+  const baseURL = import.meta.env.VITE_API_URL
 
   const token = localStorage.getItem('token')
 
@@ -15,13 +16,13 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const [resProducts, resUsers, resOrders] = await Promise.all([
-          axios.get('http://localhost:5000/api/products', {
-            params: { page: 1, limit: 1000 }, // Traemos todos los productos (sin paginar visualmente)
+          axios.get(`${baseURL}/products`, {
+            params: { page: 1, limit: 1000 },
           }),
-          axios.get('http://localhost:5000/api/admin/users/count', {
+          axios.get(`${baseURL}/admin/users/count`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get('http://localhost:5000/api/admin/orders/summary', {
+          axios.get(`${baseURL}/admin/orders/summary`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ])

@@ -47,7 +47,8 @@ const UserList = () => {
   const fetchUsers = async (pageNumber = 1, searchQuery = '') => {
     try {
       const token = localStorage.getItem('token');
-      const { data } = await axios.get('http://localhost:5000/api/users', {
+      await axios.get(`${import.meta.env.VITE_API_URL}/users`)
+, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
           page: pageNumber,
