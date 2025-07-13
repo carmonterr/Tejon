@@ -20,8 +20,8 @@ import EditIcon from '@mui/icons-material/Edit'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { toast } from 'react-toastify'
-import axios from 'axios'
 
+import API from '../api/axios' // ✅ API en lugar de axios
 import { uploadImage } from '../utils/uploadImage'
 
 const BannersPage = () => {
@@ -45,7 +45,7 @@ const BannersPage = () => {
 
   const fetchBanners = async () => {
     try {
-      const res = await axios.get('/banners')
+      const res = await API.get('/banners') // ✅ URL correcta: /api/banners → ya agregada en baseURL
       const sorted = res.data.sort((a, b) => a.order - b.order)
       setBanners(sorted)
     } catch (err) {
@@ -68,9 +68,7 @@ const BannersPage = () => {
     setFile(null)
     setPreviewUrl(null)
     setEditingId(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   const handleSubmit = async () => {
@@ -93,10 +91,10 @@ const BannersPage = () => {
       }
 
       if (editingId) {
-        await axios.put(`/banners/${editingId}`, payload)
+        await API.put(`/banners/${editingId}`, payload)
         toast.success('✅ Banner actualizado')
       } else {
-        await axios.post('/banners', { ...payload, image: imageData })
+        await API.post('/banners', { ...payload, image: imageData })
         toast.success('✅ Banner creado')
       }
 
@@ -121,16 +119,13 @@ const BannersPage = () => {
     })
     setPreviewUrl(banner.image?.url || null)
     setFile(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   const handleDelete = async (id) => {
     if (!window.confirm('¿Eliminar este banner?')) return
-
     try {
-      await axios.delete(`/banners/${id}`)
+      await API.delete(`/banners/${id}`)
       toast.success('🗑 Banner eliminado')
       fetchBanners()
     } catch (err) {
@@ -150,7 +145,6 @@ const BannersPage = () => {
         </Typography>
 
         <Grid container spacing={2}>
-          {/* Título y Link */}
           <Grid item xs={12} sm={6}>
             <TextField
               label="Título (opcional)"
@@ -160,7 +154,6 @@ const BannersPage = () => {
               onChange={handleChange}
             />
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <TextField
               label="Link (opcional)"
@@ -171,8 +164,6 @@ const BannersPage = () => {
               placeholder="/ofertas"
             />
           </Grid>
-
-          {/* Descripción */}
           <Grid item xs={12}>
             <TextField
               label="Descripción (opcional)"
@@ -184,8 +175,6 @@ const BannersPage = () => {
               onChange={handleChange}
             />
           </Grid>
-
-          {/* Orden y Alineación */}
           <Grid item xs={6} sm={3}>
             <TextField
               label="Orden"
@@ -196,7 +185,6 @@ const BannersPage = () => {
               onChange={handleChange}
             />
           </Grid>
-
           <Grid item xs={6} sm={3}>
             <TextField
               select
@@ -211,8 +199,6 @@ const BannersPage = () => {
               <option value="right">Derecha</option>
             </TextField>
           </Grid>
-
-          {/* Subida de Imagen */}
           <Grid item xs={12} sm={6}>
             <Button component="label" variant="outlined" fullWidth>
               {file ? 'Imagen seleccionada' : 'Subir imagen'}
@@ -224,15 +210,12 @@ const BannersPage = () => {
                 onChange={(e) => {
                   const selectedFile = e.target.files[0]
                   setFile(selectedFile)
-                  if (selectedFile) {
-                    setPreviewUrl(URL.createObjectURL(selectedFile))
-                  }
+                  if (selectedFile) setPreviewUrl(URL.createObjectURL(selectedFile))
                 }}
               />
             </Button>
           </Grid>
 
-          {/* Vista previa */}
           {previewUrl && (
             <Grid item xs={12}>
               <Box
@@ -260,7 +243,6 @@ const BannersPage = () => {
             </Grid>
           )}
 
-          {/* Botones */}
           <Grid item xs={12}>
             <Button variant="contained" fullWidth onClick={handleSubmit} disabled={loading}>
               {loading ? (
@@ -283,7 +265,6 @@ const BannersPage = () => {
         </Grid>
       </Paper>
 
-      {/* Lista de banners */}
       <Paper sx={{ p: 2 }}>
         {Array.isArray(banners) && banners.length === 0 ? (
           <Typography variant="body1" sx={{ mt: 2 }}>
