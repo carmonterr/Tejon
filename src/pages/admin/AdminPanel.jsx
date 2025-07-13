@@ -8,7 +8,7 @@ const AdminPanel = () => {
   const [products, setProducts] = useState([])
 
   const fetchProducts = async () => {
-    const { data } = await axios.get('http://localhost:5000/api/products')
+    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/products`)
     setProducts(data)
   }
 
@@ -17,21 +17,20 @@ const AdminPanel = () => {
   }, [])
 
   const handleProductCreated = (newProduct) => {
-    setProducts(prev => [newProduct, ...prev])
+    setProducts((prev) => [newProduct, ...prev])
   }
 
   return (
     <>
       <ProductForm onProductCreated={handleProductCreated} />
 
-    <Grid spacing={2} columns={12} sx={{ mt: 4 }}>
-  {products.map((p) => (
-    <Grid key={p._id} xs={12} sm={6} md={4} lg={3}>
-      <ProductCard product={p} />
-    </Grid>
-  ))}
-</Grid>
-
+      <Grid spacing={2} columns={12} sx={{ mt: 4 }}>
+        {products.map((p) => (
+          <Grid key={p._id} xs={12} sm={6} md={4} lg={3}>
+            <ProductCard product={p} />
+          </Grid>
+        ))}
+      </Grid>
     </>
   )
 }

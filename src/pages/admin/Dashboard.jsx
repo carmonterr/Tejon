@@ -1,35 +1,28 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Typography, Grid, Card, CardContent, Button, CircularProgress } from '@mui/material'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
+import API from '../../api/axios'
 
 const Dashboard = () => {
   const [products, setProducts] = useState([])
   const [usersCount, setUsersCount] = useState(0)
   const [orderStats, setOrderStats] = useState({ totalPedidos: 0, totalVentas: 0 })
   const [loading, setLoading] = useState(true)
-  const baseURL = import.meta.env.VITE_API_URL
-
-  const token = localStorage.getItem('token')
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [resProducts, resUsers, resOrders] = await Promise.all([
-          axios.get(`${baseURL}/products`, {
+          API.get('/products', {
             params: { page: 1, limit: 1000 },
           }),
-          axios.get(`${baseURL}/admin/users/count`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${baseURL}/admin/orders/summary`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          API.get('/admin/users/count'),
+          API.get('/admin/orders/summary'),
         ])
 
         const productosData = Array.isArray(resProducts.data.products)
           ? resProducts.data.products
-          : resProducts.data // fallback si devuelve array plano
+          : resProducts.data
 
         setProducts(productosData)
         setUsersCount(resUsers.data.totalUsers || 0)
@@ -45,7 +38,7 @@ const Dashboard = () => {
     }
 
     fetchData()
-  }, [token])
+  }, []) // 🔄 Limpiamos [token], ya no se usa
 
   if (loading) {
     return (
@@ -89,7 +82,9 @@ const Dashboard = () => {
     },
     {
       title: 'Ventas',
-      value: `$${(orderStats.totalVentas || 0).toLocaleString('es-CO', { minimumFractionDigits: 2 })}`,
+      value: `$${(orderStats.totalVentas || 0).toLocaleString('es-CO', {
+        minimumFractionDigits: 2,
+      })}`,
       color: '#FF5722',
       link: '/admin/ventas',
       linkText: 'Ver más',

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Container, TextField, Button, Typography, Grid, Alert } from '@mui/material'
-import axios from 'axios'
+
+import API from '../api/axios'
 import { useNavigate } from 'react-router-dom'
 
 const RegisterPage = () => {
@@ -31,7 +32,7 @@ const RegisterPage = () => {
 
     try {
       setLoading(true)
-      await axios.post('http://localhost:5000/api/users/register', formData)
+      await API.post('/users/register', formData)
 
       setSuccess('✅ Registro exitoso. Revisa tu correo electrónico para verificar tu cuenta.')
       setTimeout(() => navigate('/verify-email'), 2000)

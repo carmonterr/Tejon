@@ -30,7 +30,7 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { toast } from 'react-toastify'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
+import API from '../api/axios'
 
 const estados = [
   { value: '', label: 'Todos' },
@@ -67,7 +67,7 @@ const AdminOrdersPage = () => {
           ...paramsOverride,
         }
 
-        const { data } = await axios.get('http://localhost:5000/api/orders', {
+        const { data } = await API.get('/orders', {
           headers: { Authorization: `Bearer ${token}` },
           params,
         })
@@ -110,8 +110,8 @@ const AdminOrdersPage = () => {
 
   const marcarComo = async (tipo, id) => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/orders/${id}/${tipo}`,
+      await API.put(
+        `/orders/${id}/${tipo}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -134,8 +134,8 @@ const AdminOrdersPage = () => {
 
   const revertir = async (id) => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/orders/${id}/revert`,
+      await API.put(
+        `/orders/${id}/revert`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -150,7 +150,7 @@ const AdminOrdersPage = () => {
 
   const eliminar = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/orders/${id}`, {
+      await API.delete(`/orders/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       toast.success('🗑 Pedido eliminado')

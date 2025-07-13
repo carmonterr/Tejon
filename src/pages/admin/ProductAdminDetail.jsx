@@ -13,7 +13,8 @@ const ProductAdminDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/products/${id}`)
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/products/${id}`)
+
         setProduct(data)
       } catch (error) {
         console.error('⛔ Error al obtener producto:', error)

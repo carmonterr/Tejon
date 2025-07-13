@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Box, TextField, Button, Typography, Paper, CircularProgress, Alert } from '@mui/material'
-import axios from 'axios'
+
+import API from '../api/axios'
 import { useDispatch } from 'react-redux'
 import { loginSuccess } from '../redux/slices/userSlice'
 import { Link, useNavigate } from 'react-router-dom'
@@ -47,7 +48,7 @@ const LoginPage = () => {
     setFieldErrors({})
 
     try {
-      const res = await axios.post('http://localhost:5000/api/users/login', formData)
+      const res = await API.post('/users/login', formData)
 
       // ✅ Login exitoso
       dispatch(loginSuccess(res.data))

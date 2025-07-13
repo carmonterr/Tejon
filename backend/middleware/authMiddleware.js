@@ -1,39 +1,39 @@
 import jwt from 'jsonwebtoken'
 import User from '../models/userModel.js'
+import ApiError from '../utils/ApiError.js'
 
-// Middleware para proteger rutas: requiere token válido
+// 🔐 Middleware para proteger rutas
 export const protect = async (req, res, next) => {
   const authHeader = req.headers.authorization
 
-  if (authHeader && authHeader.startsWith('Bearer')) {
+  if (authHeader?.startsWith('Bearer')) {
     try {
       const token = authHeader.split(' ')[1]
-
-      // Verificar el token
       const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-      // Buscar al usuario y anexarlo a la solicitud
       const user = await User.findById(decoded.id).select('-password')
       if (!user) {
-        return res.status(401).json({ message: 'Usuario no encontrado' })
+        return next(new ApiError('⚠️ Usuario no encontrado', 401, 'USER_NOT_FOUND'))
       }
 
       req.user = user
       next()
     } catch (error) {
       console.error('⛔ Error de autenticación:', error)
-      return res.status(401).json({ message: 'Token no válido' })
+      return next(new ApiError('❌ Token no válido o expirado', 401, 'INVALID_TOKEN'))
     }
   } else {
-    return res.status(401).json({ message: 'No autorizado, token faltante' })
+    return next(new ApiError('🔒 No autorizado. Token no proporcionado.', 401, 'NO_TOKEN'))
   }
 }
 
-// Middleware para permitir solo a administradores
+// 🛡️ Middleware para validar si es administrador
 export const isAdmin = (req, res, next) => {
-  if (req.user && req.user.isAdmin) {
+  if (req.user?.isAdmin) {
     next()
   } else {
-    return res.status(403).json({ message: 'Acceso denegado. No eres administrador.' })
+    return next(
+      new ApiError('🚫 Acceso denegado. Requiere rol de administrador.', 403, 'NOT_ADMIN')
+    )
   }
 }

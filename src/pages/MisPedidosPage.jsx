@@ -17,7 +17,8 @@ import {
   Stack,
 } from '@mui/material'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
+
+import API from '../api/axios'
 import { toast } from 'react-toastify'
 
 const MisPedidosPage = () => {
@@ -34,7 +35,7 @@ const MisPedidosPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/orders/mine', {
+        const { data } = await API.get('/orders/mine', {
           headers: { Authorization: `Bearer ${user.token}` },
         })
         // Ordenar: más recientes primero

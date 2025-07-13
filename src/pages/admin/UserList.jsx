@@ -47,7 +47,6 @@ const UserList = () => {
 
   const fetchUsers = async (pageNumber = 1, searchQuery = '') => {
     try {
-      const token = localStorage.getItem('token')
       const { data } = await API.get('/users', {
         params: {
           page: pageNumber,
@@ -55,7 +54,6 @@ const UserList = () => {
           search: searchQuery,
         },
       })
-
       const usersArray = Array.isArray(data.users) ? data.users : []
       setUsers(usersArray)
       setPage(Number(data.page) || 1)
@@ -74,18 +72,15 @@ const UserList = () => {
     fetchUsers(page, search)
   }, [page, search])
 
-  const handlePageChange = (event, value) => {
+  const handlePageChange = (_, value) => {
     setPage(value)
   }
 
   const handleDelete = async (id) => {
     if (!window.confirm('¿Eliminar este usuario?')) return
     try {
-      const token = localStorage.getItem('token')
-      await API.delete(`/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      fetchUsers(page, search) // Recargar usuarios actuales
+      await API.delete(`/users/${id}`)
+      fetchUsers(page, search)
     } catch (err) {
       console.error('⛔ Error al eliminar usuario:', err)
     }
@@ -93,11 +88,8 @@ const UserList = () => {
 
   const toggleAdmin = async (user) => {
     try {
-      const token = localStorage.getItem('token')
       const updated = { ...user, isAdmin: !user.isAdmin }
-      await API.put(`/users/${user._id}`, updated, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      await API.put(`/users/${user._id}`, updated)
       fetchUsers(page, search)
     } catch (err) {
       console.error('⛔ Error al cambiar rol:', err)
@@ -111,10 +103,7 @@ const UserList = () => {
 
   const handleEditSubmit = async (data) => {
     try {
-      const token = localStorage.getItem('token')
-      await API.put(`/users/${editUser._id}`, data, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      await API.put(`/users/${editUser._id}`, data)
       setEditUser(null)
       fetchUsers(page, search)
     } catch (err) {

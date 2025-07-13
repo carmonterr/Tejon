@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Box, TextField, Button, Typography, Paper, Alert } from '@mui/material'
-import axios from 'axios'
+
+import API from '../api/axios'
 import { toast } from 'react-toastify'
 
 const ForgotPasswordPage = () => {
@@ -38,7 +39,7 @@ const ForgotPasswordPage = () => {
     try {
       setLoading(true)
 
-      await axios.post('http://localhost:5000/api/users/forgot-password', { email })
+      await API.post('/users/forgot-password', { email })
 
       setSuccess('📧 Te enviamos un correo con las instrucciones para recuperar tu contraseña.')
       toast.success('Correo enviado correctamente.')

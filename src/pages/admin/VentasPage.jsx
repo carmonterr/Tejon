@@ -29,7 +29,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js'
-import axios from 'axios'
+import API from '../../api/axios'
 
 ChartJS.register(
   LineElement,
@@ -58,7 +58,7 @@ const VentasPage = () => {
   const fetchVentasPorFecha = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await axios.get('http://localhost:5000/api/admin/ventas/por-fecha', {
+      const res = await API.get('/admin/ventas/por-fecha', {
         headers: { Authorization: `Bearer ${token}` },
         params: {
           from: fromDate?.toLocaleDateString('en-CA') || '',

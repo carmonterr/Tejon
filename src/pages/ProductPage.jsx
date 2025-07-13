@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../redux/slices/cartSlice'
 import { toast } from 'react-toastify'
 import axios from 'axios'
+
 import { uploadImage } from '../utils/uploadImage'
 
 const ProductPage = () => {
@@ -347,7 +348,7 @@ const ProductPage = () => {
 
                     toast.success('Opinión eliminada')
                     const { data } = await axios.get(
-                      `http://localhost:5000/api/products/${product._id}`
+                      `${import.meta.env.VITE_API_URL}/products/${product._id}`
                     )
                     setProduct(data)
                   } catch (err) {

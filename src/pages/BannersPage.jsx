@@ -20,7 +20,8 @@ import EditIcon from '@mui/icons-material/Edit'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { toast } from 'react-toastify'
-import axios from '../utils/axios'
+import axios from 'axios'
+
 import { uploadImage } from '../utils/uploadImage'
 
 const BannersPage = () => {

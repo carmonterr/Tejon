@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Container, TextField, Button, Typography, Grid, Alert } from '@mui/material'
-import axios from 'axios'
+
+import API from '../api/axios'
 import { useNavigate } from 'react-router-dom'
 
 const VerifyEmailPage = () => {
@@ -27,7 +28,7 @@ const VerifyEmailPage = () => {
     try {
       setLoading(true)
 
-      await axios.post('http://localhost:5000/api/users/verify-email', formData)
+      await API.post('/users/verify-email', formData)
 
       setSuccess('✅ Cuenta verificada correctamente.')
       setTimeout(() => navigate('/login'), 2000)

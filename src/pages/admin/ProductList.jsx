@@ -83,7 +83,7 @@ const ProductList = () => {
 
   const toggleProductStatus = async (id, newStatus) => {
     try {
-      await axios.put(`http://localhost:5000/api/products/${id}`, { activo: newStatus })
+      await axios.put(`${import.meta.env.VITE_API_URL}/products/${id}`, { activo: newStatus })
       loadProducts(currentPage)
     } catch (err) {
       console.error('⛔ Error al cambiar estado:', err)

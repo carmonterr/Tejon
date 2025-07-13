@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Box, TextField, Button, Typography, Paper, Alert } from '@mui/material'
-import axios from 'axios'
+
+import API from '../api/axios'
 import { toast } from 'react-toastify'
 
 const ResetPasswordPage = () => {
@@ -26,7 +27,7 @@ const ResetPasswordPage = () => {
     }
 
     try {
-      await axios.post(`http://localhost:5000/api/users/reset-password/${token}`, {
+      await API.post(`/users/reset-password/${token}`, {
         password,
       })
 

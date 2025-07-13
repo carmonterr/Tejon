@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from 'react'
 import { Typography, Box, CircularProgress, Chip, Stack, Divider } from '@mui/material'
 import { useParams } from 'react-router-dom'
-import axios from 'axios'
+
+import API from '../api/axios'
 import { toast } from 'react-toastify'
 import ComprobantePedido from '../components/ComprobantePedido'
 
@@ -15,7 +16,7 @@ const PedidoDetalle = () => {
   useEffect(() => {
     const fetchPedido = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/orders/${id}`, {
+        const { data } = await API.get(`/orders/${id}`, {
           headers: { Authorization: `Bearer ${user.token}` },
         })
         setPedido(data)

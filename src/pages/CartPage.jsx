@@ -19,7 +19,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { removeFromCart, updateQty, clearCart } from '../redux/slices/cartSlice'
 import { toast } from 'react-toastify'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+
+import API from '../api/axios'
 import ModalPedido from '../components/ModalPedido'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 
@@ -80,8 +81,8 @@ const CartPage = () => {
     )
 
     try {
-      await axios.post(
-        'http://localhost:5000/api/orders',
+      await API.post(
+        '/orders',
         {
           orderItems,
           shippingPrice: shipping,
