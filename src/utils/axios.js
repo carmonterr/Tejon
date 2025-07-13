@@ -3,7 +3,8 @@ import axios from 'axios'
 
 // Creamos una instancia personalizada
 const api = axios.create({
-  baseURL: '/api', // gracias al proxy de Vite, esto apunta a localhost:5000
+  baseURL: import.meta.env.VITE_API_URL,
+  // gracias al proxy de Vite, esto apunta a localhost:5000
 })
 
 // Interceptor para agregar el token en cada request
