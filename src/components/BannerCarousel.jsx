@@ -14,7 +14,7 @@ const BannerCarousel = () => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await API.get('/banners') // ✅ correcto: irá a https://tu-backend/api/banners
+        const res = await API.get('api/banners') // ✅ correcto: irá a https://tu-backend/api/banners
         const sorted = res.data.sort((a, b) => a.order - b.order)
         setBanners(sorted)
       } catch (err) {

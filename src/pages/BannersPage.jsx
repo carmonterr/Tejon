@@ -45,7 +45,7 @@ const BannersPage = () => {
 
   const fetchBanners = async () => {
     try {
-      const res = await API.get('/banners') // ✅ URL correcta: /api/banners → ya agregada en baseURL
+      const res = await API.get('api/banners') // ✅ URL correcta: /api/banners → ya agregada en baseURL
       const sorted = res.data.sort((a, b) => a.order - b.order)
       setBanners(sorted)
     } catch (err) {
@@ -91,10 +91,10 @@ const BannersPage = () => {
       }
 
       if (editingId) {
-        await API.put(`/banners/${editingId}`, payload)
+        await API.put(`api/banners/${editingId}`, payload)
         toast.success('✅ Banner actualizado')
       } else {
-        await API.post('/banners', { ...payload, image: imageData })
+        await API.post('api/banners', { ...payload, image: imageData })
         toast.success('✅ Banner creado')
       }
 
