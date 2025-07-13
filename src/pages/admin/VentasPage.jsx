@@ -58,7 +58,7 @@ const VentasPage = () => {
   const fetchVentasPorFecha = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await API.get('/admin/ventas/por-fecha', {
+      const res = await API.get('api/admin/ventas/por-fecha', {
         headers: { Authorization: `Bearer ${token}` },
         params: {
           from: fromDate?.toLocaleDateString('en-CA') || '',

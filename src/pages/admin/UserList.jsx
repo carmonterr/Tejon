@@ -47,7 +47,7 @@ const UserList = () => {
 
   const fetchUsers = async (pageNumber = 1, searchQuery = '') => {
     try {
-      const { data } = await API.get('/users', {
+      const { data } = await API.get('api/users', {
         params: {
           page: pageNumber,
           limit: 5,
@@ -79,7 +79,7 @@ const UserList = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('¿Eliminar este usuario?')) return
     try {
-      await API.delete(`/users/${id}`)
+      await API.delete(`api/users/${id}`)
       fetchUsers(page, search)
     } catch (err) {
       console.error('⛔ Error al eliminar usuario:', err)
@@ -89,7 +89,7 @@ const UserList = () => {
   const toggleAdmin = async (user) => {
     try {
       const updated = { ...user, isAdmin: !user.isAdmin }
-      await API.put(`/users/${user._id}`, updated)
+      await API.put(`api/users/${user._id}`, updated)
       fetchUsers(page, search)
     } catch (err) {
       console.error('⛔ Error al cambiar rol:', err)
@@ -103,7 +103,7 @@ const UserList = () => {
 
   const handleEditSubmit = async (data) => {
     try {
-      await API.put(`/users/${editUser._id}`, data)
+      await API.put(`api/users/${editUser._id}`, data)
       setEditUser(null)
       fetchUsers(page, search)
     } catch (err) {

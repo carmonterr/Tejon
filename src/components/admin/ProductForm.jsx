@@ -46,7 +46,7 @@ const ProductForm = () => {
     if (editing) {
       const fetchProduct = async () => {
         try {
-          const { data } = await api.get(`/products/${id}`)
+          const { data } = await api.get(`api/products/${id}`)
           setProductData(data)
           if (Array.isArray(data.imagen)) {
             const urls = data.imagen.map((img) => img.url || img)
@@ -105,10 +105,10 @@ const ProductForm = () => {
       }
 
       if (editing) {
-        await api.put(`/products/${id}`, payload, config)
+        await api.put(`api/products/${id}`, payload, config)
         alert('✅ Producto actualizado correctamente')
       } else {
-        await api.post('/products', payload, config)
+        await api.post('api/products', payload, config)
         alert('✅ Producto creado correctamente')
       }
 

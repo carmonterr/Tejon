@@ -48,7 +48,7 @@ const LoginPage = () => {
     setFieldErrors({})
 
     try {
-      const res = await API.post('/users/login', formData)
+      const res = await API.post('api/users/login', formData)
 
       // ✅ Login exitoso
       dispatch(loginSuccess(res.data))

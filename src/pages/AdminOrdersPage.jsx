@@ -67,7 +67,7 @@ const AdminOrdersPage = () => {
           ...paramsOverride,
         }
 
-        const { data } = await API.get('/orders', {
+        const { data } = await API.get('api/orders', {
           headers: { Authorization: `Bearer ${token}` },
           params,
         })
@@ -111,7 +111,7 @@ const AdminOrdersPage = () => {
   const marcarComo = async (tipo, id) => {
     try {
       await API.put(
-        `/orders/${id}/${tipo}`,
+        `api/orders/${id}/${tipo}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -135,7 +135,7 @@ const AdminOrdersPage = () => {
   const revertir = async (id) => {
     try {
       await API.put(
-        `/orders/${id}/revert`,
+        `api/orders/${id}/revert`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -150,7 +150,7 @@ const AdminOrdersPage = () => {
 
   const eliminar = async (id) => {
     try {
-      await API.delete(`/orders/${id}`, {
+      await API.delete(`api/orders/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       toast.success('🗑 Pedido eliminado')

@@ -82,7 +82,7 @@ const CartPage = () => {
 
     try {
       await API.post(
-        '/orders',
+        'api/orders',
         {
           orderItems,
           shippingPrice: shipping,

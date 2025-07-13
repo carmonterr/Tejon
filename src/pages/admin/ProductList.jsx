@@ -68,7 +68,7 @@ const ProductList = () => {
 
     try {
       const token = localStorage.getItem('token') // Asegúrate de que el token esté guardado
-      await axios.delete(`${import.meta.env.VITE_API_URL}/products/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}api/products/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -83,7 +83,7 @@ const ProductList = () => {
 
   const toggleProductStatus = async (id, newStatus) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/products/${id}`, { activo: newStatus })
+      await axios.put(`${import.meta.env.VITE_API_URL}api/products/${id}`, { activo: newStatus })
       loadProducts(currentPage)
     } catch (err) {
       console.error('⛔ Error al cambiar estado:', err)

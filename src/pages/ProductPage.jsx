@@ -20,7 +20,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../redux/slices/cartSlice'
 import { toast } from 'react-toastify'
-import axios from 'axios'
+
 import api from '../utils/axios'
 import { uploadImage } from '../utils/uploadImage'
 
@@ -43,7 +43,7 @@ const ProductPage = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/products/${id}`)
+      const { data } = await api.get(`api/products/${id}`)
 
       setProduct(data)
       document.title = `${data.nombre} | Tienda MERN`
@@ -63,7 +63,7 @@ const ProductPage = () => {
         const token = localStorage.getItem('token')
         if (!token) return
 
-        const { data } = await api.get(`/products/${id}/can-review`, {
+        const { data } = await api.get(`api/products/${id}/can-review`, {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -140,7 +140,7 @@ const ProductPage = () => {
       }
 
       await api.post(
-        `/products/${product._id}/reviews`,
+        `api/products/${product._id}/reviews`,
         { rating, comentario, imagenCliente: imagenUrl },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -151,7 +151,7 @@ const ProductPage = () => {
       setImagenCliente(null)
       setPreview(null)
 
-      const { data } = await api.get(`/products/${id}`)
+      const { data } = await api.get(`api/products/${id}`)
 
       setProduct(data)
     } catch (error) {
@@ -338,12 +338,12 @@ const ProductPage = () => {
                 onClick={async () => {
                   try {
                     const token = localStorage.getItem('token')
-                    await api.delete(`/products/${product._id}/reviews/${review._id}`, {
+                    await api.delete(`api/products/${product._id}/reviews/${review._id}`, {
                       headers: { Authorization: `Bearer ${token}` },
                     })
 
                     toast.success('Opinión eliminada')
-                    const { data } = await api.get(`/products/${product._id}`)
+                    const { data } = await api.get(`api/products/${product._id}`)
                     setProduct(data)
                   } catch (err) {
                     toast.error('Error al eliminar opinión')

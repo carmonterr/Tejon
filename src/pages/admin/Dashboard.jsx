@@ -13,11 +13,11 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const [resProducts, resUsers, resOrders] = await Promise.all([
-          API.get('/products', {
+          API.get('api/products', {
             params: { page: 1, limit: 1000 },
           }),
-          API.get('/admin/users/count'),
-          API.get('/admin/orders/summary'),
+          API.get('api/admin/users/count'),
+          API.get('api/admin/orders/summary'),
         ])
 
         const productosData = Array.isArray(resProducts.data.products)

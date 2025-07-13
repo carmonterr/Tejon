@@ -39,7 +39,7 @@ const ForgotPasswordPage = () => {
     try {
       setLoading(true)
 
-      await API.post('/users/forgot-password', { email })
+      await API.post('api/users/forgot-password', { email })
 
       setSuccess('📧 Te enviamos un correo con las instrucciones para recuperar tu contraseña.')
       toast.success('Correo enviado correctamente.')

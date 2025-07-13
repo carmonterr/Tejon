@@ -28,7 +28,7 @@ const VerifyEmailPage = () => {
     try {
       setLoading(true)
 
-      await API.post('/users/verify-email', formData)
+      await API.post('api/users/verify-email', formData)
 
       setSuccess('✅ Cuenta verificada correctamente.')
       setTimeout(() => navigate('/login'), 2000)

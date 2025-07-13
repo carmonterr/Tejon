@@ -32,7 +32,7 @@ const RegisterPage = () => {
 
     try {
       setLoading(true)
-      await API.post('/users/register', formData)
+      await API.post('api/users/register', formData)
 
       setSuccess('✅ Registro exitoso. Revisa tu correo electrónico para verificar tu cuenta.')
       setTimeout(() => navigate('/verify-email'), 2000)

@@ -16,7 +16,7 @@ const PedidoDetalle = () => {
   useEffect(() => {
     const fetchPedido = async () => {
       try {
-        const { data } = await API.get(`/orders/${id}`, {
+        const { data } = await API.get(`api/orders/${id}`, {
           headers: { Authorization: `Bearer ${user.token}` },
         })
         setPedido(data)

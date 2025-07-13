@@ -125,7 +125,7 @@ const BannersPage = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('¿Eliminar este banner?')) return
     try {
-      await API.delete(`/banners/${id}`)
+      await API.delete(`api/banners/${id}`)
       toast.success('🗑 Banner eliminado')
       fetchBanners()
     } catch (err) {

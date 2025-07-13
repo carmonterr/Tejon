@@ -35,7 +35,7 @@ const MisPedidosPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const { data } = await API.get('/orders/mine', {
+        const { data } = await API.get('api/orders/mine', {
           headers: { Authorization: `Bearer ${user.token}` },
         })
         // Ordenar: más recientes primero
