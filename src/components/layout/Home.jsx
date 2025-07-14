@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
-  Container,
   Typography,
   Pagination,
   Box,
@@ -21,13 +20,11 @@ const Home = () => {
   const dispatch = useDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  // Leer query params
   const search = searchParams.get('search') || ''
   const categoria = searchParams.get('categoria') || ''
   const sort = searchParams.get('sort') || 'newest'
   const pageFromUrl = parseInt(searchParams.get('page') || '1', 10)
 
-  // Redux
   const { products = [], pages = 1, loading = false } = useSelector((state) => state.product) || {}
 
   useEffect(() => {
@@ -40,8 +37,8 @@ const Home = () => {
   }
 
   return (
-    <Container sx={{ mt: 4 }}>
-      {/* Carrusel */}
+    <Box sx={{ mt: 4, px: { xs: 2, sm: 4, md: 8 } }}>
+      {/* Carrusel a pantalla completa */}
       <BannerCarousel />
 
       {/* Título y Filtros */}
@@ -54,7 +51,7 @@ const Home = () => {
         mb={2}
       >
         <Typography variant="h4" gutterBottom>
-          Productos Destacados
+          Sale
         </Typography>
 
         <Box display="flex" gap={2} flexWrap="wrap">
@@ -145,7 +142,7 @@ const Home = () => {
           )}
         </>
       )}
-    </Container>
+    </Box>
   )
 }
 

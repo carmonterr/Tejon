@@ -10,11 +10,13 @@ import { errorHandler } from './middleware/errorHandler.js'
 import { scheduleUserCleanup } from './cron/cleanUnverifiedUsers.js'
 import bannerRoutes from './routes/bannerRoutes.js'
 
-dotenv.config()
 connectDB()
 
 const app = express()
 
+//deven de estar antes de usar process.env el dotenv.config()
+//para que cargue las variables de entorno antes de usarlas
+dotenv.config()
 app.use(
   cors({
     origin: process.env.CLIENT_URL,

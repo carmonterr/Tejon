@@ -4,8 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useSwipeable } from 'react-swipeable'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
-
-import API from '../api/axios' // ✅ usamos instancia configurada con baseURL
+import API from '../api/axios'
 
 const BannerCarousel = () => {
   const [banners, setBanners] = useState([])
@@ -14,7 +13,7 @@ const BannerCarousel = () => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await API.get('api/banners') // ✅ correcto: irá a https://tu-backend/api/banners
+        const res = await API.get('api/banners')
         const sorted = res.data.sort((a, b) => a.order - b.order)
         setBanners(sorted)
       } catch (err) {
@@ -55,10 +54,14 @@ const BannerCarousel = () => {
       {...swipeHandlers}
       sx={{
         position: 'relative',
-        width: '100%',
+        width: '100vw', // 📌 ocupa todo el ancho visible
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw',
         height: { xs: 180, sm: 300, md: 400 },
         overflow: 'hidden',
-        borderRadius: 2,
+        borderRadius: 0, // ❌ sin bordes redondeados
         mb: 0,
       }}
     >

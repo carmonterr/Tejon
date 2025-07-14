@@ -43,17 +43,29 @@ const ProductPage = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const { data } = await api.get(`api/products/${id}`)
+      try {
+        const { data } = await api.get(`api/products/${id}`)
+        console.log('🧾 Producto recibido:', data)
 
-      setProduct(data)
-      document.title = `${data.nombre} | Tienda MERN`
+        setProduct(data)
+        document.title = `${data.nombre} | Tienda MERN`
 
-      const inicial = {}
-      data.tallasDisponibles.forEach((t) => {
-        inicial[t] = 0
-      })
-      setCantidadesPorTalla(inicial)
+        // 💡 Protección contra undefined en tallasDisponibles
+        if (Array.isArray(data.tallasDisponibles)) {
+          const inicial = {}
+          data.tallasDisponibles.forEach((t) => {
+            inicial[t] = 0
+          })
+          setCantidadesPorTalla(inicial)
+        } else {
+          console.warn('⚠️ tallasDisponibles no es un array:', data.tallasDisponibles)
+          setCantidadesPorTalla({})
+        }
+      } catch (err) {
+        console.error('❌ Error al obtener el producto:', err)
+      }
     }
+
     fetchProduct()
   }, [id])
 
@@ -270,7 +282,7 @@ const ProductPage = () => {
             </Box>
 
             <Typography variant="h5" color="green" fontWeight="bold" sx={{ mt: 2 }}>
-              ${product.precio.toLocaleString()}
+              {`$${Number(product?.precio || 0).toLocaleString()}`}
             </Typography>
 
             <Typography sx={{ mt: 2 }}>
