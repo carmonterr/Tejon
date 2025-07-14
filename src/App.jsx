@@ -40,6 +40,7 @@ import { useColorMode } from './ThemeContext'
 import Contacto from './pages/Contacto'
 import SobreNosotros from './pages/SobreNosotros'
 import PoliticaPrivacidad from './pages/PoliticaPrivacidad'
+import MainLayout from './components/layout/MainLayout'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -64,6 +65,7 @@ const App = () => {
       <Header />
       <Routes>
         {/* Rutas públicas */}
+        <Route element={<MainLayout />}></Route>
         <Route path="/" element={<Home />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/product/:id" element={<ProductPage />} />

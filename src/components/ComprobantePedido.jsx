@@ -18,11 +18,12 @@ const ComprobantePedido = ({ pedido, user }) => {
     const pageWidth = pdf.internal.pageSize.getWidth()
 
     const logo = new Image()
-    logo.src = '/prueba.jpg'
+    logo.src = import.meta.env.BASE_URL + 'logo.png' // ✅ usa tu logo local
 
     logo.onload = () => {
       const centerX = pageWidth / 2
-      pdf.addImage(logo, 'jpg', 15, 10, 20, 20)
+      pdf.addImage(logo, 'PNG', 15, 10, 20, 20)
+
       pdf.setFontSize(18)
       pdf.setFont('helvetica', 'bold')
       pdf.text('Tienda MERN', centerX, 20, { align: 'center' })
@@ -33,7 +34,7 @@ const ComprobantePedido = ({ pedido, user }) => {
       pdf.setLineWidth(0.2)
       pdf.line(10, 32, pageWidth - 10, 32)
 
-      pdf.addImage(imgData, 'jpg', 10, 35, pageWidth - 20, 0)
+      pdf.addImage(imgData, 'PNG', 10, 35, pageWidth - 20, 0)
 
       pdf.setFontSize(10)
       pdf.setTextColor(150)
@@ -42,21 +43,45 @@ const ComprobantePedido = ({ pedido, user }) => {
       pdf.save(`pedido_${pedido._id.slice(-6)}.pdf`)
       toast.success('📄 PDF generado correctamente')
     }
+
+    logo.onerror = () => {
+      toast.error('❌ Error al cargar el logo desde /public/logo.png')
+    }
   }
 
   return (
     <>
-      <Box ref={ref} sx={{ p: 4, maxWidth: '800px', mx: 'auto', backgroundColor: '#fff' }}>
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Avatar
-            src="https://cdn-icons-png.flaticon.com/512/10793/10793764.png"
-            sx={{ width: 72, height: 72, mx: 'auto', mb: 1 }}
+      <Box
+        ref={ref}
+        sx={{
+          p: 4,
+          maxWidth: '800px',
+          mx: 'auto',
+          mt: 2,
+          backgroundColor: '#fff',
+          borderRadius: 2,
+        }}
+      >
+        <Box sx={{ textAlign: 'center', mb: 2 }}>
+          <Box
+            component="img"
+            src="/logo.png"
+            alt="Logo Tienda"
+            sx={{
+              width: 64,
+              height: 64,
+              borderRadius: '50%',
+              objectFit: 'cover',
+              mx: 'auto',
+              mb: 1,
+            }}
           />
-          <Typography variant="h5" fontWeight="bold">
-            Tienda MERN
+          <Typography variant="h6" fontWeight="bold" gutterBottom>
+            Calzado CarMon
           </Typography>
-          <Typography variant="subtitle2">Comprobante de Pedido</Typography>
-          <Divider sx={{ my: 2 }} />
+          <Typography variant="subtitle2" color="text.secondary">
+            Comprobante de Pedido
+          </Typography>
         </Box>
 
         <Box sx={{ mb: 2 }}>
@@ -84,15 +109,9 @@ const ComprobantePedido = ({ pedido, user }) => {
                 size="small"
               />
             </Box>
-            {pedido.isDelivered && pedido.deliveredAt && (
-              <Typography sx={{ color: 'gray', fontSize: 13 }}>
-                Entregado el:{' '}
-                {new Date(pedido.deliveredAt).toLocaleString('es-ES', {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-                })}
-              </Typography>
-            )}
+            <Typography sx={{ color: 'gray', fontSize: 13 }}>
+              Fecha: {new Date(pedido.createdAt).toLocaleDateString('es-ES')}
+            </Typography>
           </Box>
         </Box>
 
@@ -123,7 +142,12 @@ const ComprobantePedido = ({ pedido, user }) => {
               pedido.orderItems.reduce((acc, item) => {
                 const key = `${item.name}-${item.image}`
                 if (!acc[key]) {
-                  acc[key] = { name: item.name, image: item.image, price: item.price, tallas: [] }
+                  acc[key] = {
+                    name: item.name,
+                    image: item.image,
+                    price: item.price,
+                    tallas: [],
+                  }
                 }
                 acc[key].tallas.push({
                   talla: item.talla !== undefined ? item.talla : 'No especificada',
@@ -146,7 +170,9 @@ const ComprobantePedido = ({ pedido, user }) => {
                     {producto.tallas.map((tallaItem, tallaIdx) => (
                       <Typography key={tallaIdx}>
                         Talla: {tallaItem.talla}, Cantidad: {tallaItem.qty}, Subtotal: $
-                        {tallaItem.subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        {tallaItem.subtotal.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                        })}
                       </Typography>
                     ))}
                     <Typography>Precio unitario: ${producto.price.toLocaleString()}</Typography>
@@ -199,6 +225,7 @@ ComprobantePedido.propTypes = {
     isPaid: PropTypes.bool,
     isDelivered: PropTypes.bool,
     deliveredAt: PropTypes.string,
+    createdAt: PropTypes.string,
     orderItems: PropTypes.arrayOf(
       PropTypes.shape({
         name: PropTypes.string.isRequired,

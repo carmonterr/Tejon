@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import {
-  Container,
   Grid,
   Typography,
   Button,
@@ -45,24 +44,18 @@ const ProductPage = () => {
     const fetchProduct = async () => {
       try {
         const { data } = await api.get(`api/products/${id}`)
-        console.log('🧾 Producto recibido:', data)
-
         setProduct(data)
         document.title = `${data.nombre} | Tienda MERN`
 
-        // 💡 Protección contra undefined en tallasDisponibles
         if (Array.isArray(data.tallasDisponibles)) {
           const inicial = {}
           data.tallasDisponibles.forEach((t) => {
             inicial[t] = 0
           })
           setCantidadesPorTalla(inicial)
-        } else {
-          console.warn('⚠️ tallasDisponibles no es un array:', data.tallasDisponibles)
-          setCantidadesPorTalla({})
         }
       } catch (err) {
-        console.error('❌ Error al obtener el producto:', err)
+        toast.error('Error al obtener el producto')
       }
     }
 
@@ -80,15 +73,12 @@ const ProductPage = () => {
         })
 
         setPuedeOpinar(data.canReview)
-      } catch (err) {
-        console.error('Error al verificar permiso de opinión:', err)
+      } catch {
         setPuedeOpinar(false)
       }
     }
 
-    if (userInfo) {
-      verificarPermiso()
-    }
+    if (userInfo) verificarPermiso()
   }, [id, userInfo])
 
   const handleAddToCart = () => {
@@ -111,7 +101,7 @@ const ProductPage = () => {
       addToCart({
         _id: product._id,
         name: product.nombre,
-        imagen: imagenes[currentImg]?.url, // 👈 Esta es la imagen que el usuario seleccionó
+        imagen: imagenes[currentImg]?.url,
         price: product.precio,
         tallas,
       })
@@ -164,7 +154,6 @@ const ProductPage = () => {
       setPreview(null)
 
       const { data } = await api.get(`api/products/${id}`)
-
       setProduct(data)
     } catch (error) {
       toast.error(error.response?.data?.message || 'Error al enviar opinión')
@@ -175,14 +164,14 @@ const ProductPage = () => {
 
   if (!product) {
     return (
-      <Container sx={{ mt: 4 }}>
+      <Box sx={{ width: '100%', maxWidth: '1200px', mx: 'auto', px: { xs: 2, md: 4 }, mt: 4 }}>
         <Typography variant="h5">Cargando producto...</Typography>
-      </Container>
+      </Box>
     )
   }
 
   return (
-    <Container sx={{ mt: 4 }}>
+    <Box sx={{ width: '100%', maxWidth: '1200px', mx: 'auto', px: { xs: 2, md: 4 }, mt: 4 }}>
       <Box sx={{ mb: 3 }}>
         <Button
           variant="contained"
@@ -195,43 +184,39 @@ const ProductPage = () => {
           Volver al inicio
         </Button>
       </Box>
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={5}>
+
+      <Grid container spacing={4} alignItems="flex-start" justifyContent="center">
+        {/* Imagen principal */}
+        <Grid item xs={12} md={6}>
           <Box
-            component="img"
-            src={imagenes[currentImg]?.url}
-            alt={product.nombre}
-            onClick={() => handleZoomOpen(currentImg)}
             sx={{
               width: '100%',
+              height: 400,
               borderRadius: 2,
-              objectFit: 'contain',
-              maxHeight: 400,
+              backgroundColor: '#f5f5f5',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              overflow: 'hidden',
               cursor: 'zoom-in',
             }}
-          />
-          <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-            {imagenes.map((img, idx) => (
-              <Box
-                key={idx}
-                component="img"
-                src={img.url}
-                alt={`Miniatura ${idx + 1}`}
-                onClick={() => setCurrentImg(idx)}
-                sx={{
-                  width: 60,
-                  height: 60,
-                  objectFit: 'cover',
-                  borderRadius: 1,
-                  border: idx === currentImg ? '2px solid #1976d2' : '1px solid #ccc',
-                  cursor: 'pointer',
-                }}
-              />
-            ))}
+            onClick={() => handleZoomOpen(currentImg)}
+          >
+            <Box
+              component="img"
+              src={imagenes[currentImg]?.url}
+              alt={product.nombre}
+              sx={{
+                maxHeight: '100%',
+                maxWidth: '100%',
+                objectFit: 'contain',
+              }}
+            />
           </Box>
         </Grid>
 
-        <Grid item xs={12} md={5} display="flex" justifyContent="flex-end">
+        {/* Detalles del producto */}
+        <Grid item xs={12} md={6}>
           <Box
             sx={{ width: '100%', maxWidth: 420, p: 2, border: '1px solid #eee', borderRadius: 2 }}
           >
@@ -279,6 +264,31 @@ const ProductPage = () => {
                 ({product.numCalificaciones || 0} opiniones) • {product.sold?.toLocaleString() || 0}{' '}
                 vendidos
               </Typography>
+            </Box>
+
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                Color: {product.color || 'No especificado'}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                {imagenes.map((img, idx) => (
+                  <Box
+                    key={idx}
+                    component="img"
+                    src={img.url}
+                    alt={`Miniatura ${idx + 1}`}
+                    onClick={() => setCurrentImg(idx)}
+                    sx={{
+                      width: 60,
+                      height: 60,
+                      objectFit: 'cover',
+                      borderRadius: 1,
+                      border: idx === currentImg ? '2px solid #1976d2' : '1px solid #ccc',
+                      cursor: 'pointer',
+                    }}
+                  />
+                ))}
+              </Box>
             </Box>
 
             <Typography variant="h5" color="green" fontWeight="bold" sx={{ mt: 2 }}>
@@ -353,11 +363,10 @@ const ProductPage = () => {
                     await api.delete(`api/products/${product._id}/reviews/${review._id}`, {
                       headers: { Authorization: `Bearer ${token}` },
                     })
-
                     toast.success('Opinión eliminada')
                     const { data } = await api.get(`api/products/${product._id}`)
                     setProduct(data)
-                  } catch (err) {
+                  } catch {
                     toast.error('Error al eliminar opinión')
                   }
                 }}
@@ -453,7 +462,7 @@ const ProductPage = () => {
           </IconButton>
         </Box>
       </Modal>
-    </Container>
+    </Box>
   )
 }
 
