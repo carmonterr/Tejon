@@ -12,10 +12,12 @@ const cartSlice = createSlice({
   reducers: {
     addToCart: (state, action) => {
       const item = action.payload
-      const existingItem = state.cartItems.find((p) => p._id === item._id)
+
+      // Buscar por uniqueId en lugar de _id
+      const existingItem = state.cartItems.find((p) => p.uniqueId === item.uniqueId)
 
       if (existingItem) {
-        // Actualizar o agregar tallas nuevas
+        // Sumar cantidades por talla
         item.tallas.forEach(({ talla, qty }) => {
           const existingTalla = existingItem.tallas.find((t) => t.talla === talla)
           if (existingTalla) {
@@ -25,6 +27,7 @@ const cartSlice = createSlice({
           }
         })
       } else {
+        // Agregar nuevo ítem al carrito
         state.cartItems.push({
           ...item,
           tallas: item.tallas.map(({ talla, qty }) => ({ talla, qty })),
@@ -33,8 +36,8 @@ const cartSlice = createSlice({
     },
 
     updateQty: (state, action) => {
-      const { id, talla, qty } = action.payload
-      const item = state.cartItems.find((i) => i._id === id)
+      const { uniqueId, talla, qty } = action.payload
+      const item = state.cartItems.find((i) => i.uniqueId === uniqueId)
       if (item) {
         const tallaItem = item.tallas.find((t) => t.talla === talla)
         if (tallaItem) {
@@ -44,13 +47,13 @@ const cartSlice = createSlice({
     },
 
     removeFromCart: (state, action) => {
-      const { id, talla } = action.payload
-      const item = state.cartItems.find((i) => i._id === id)
+      const { uniqueId, talla } = action.payload
+      const item = state.cartItems.find((i) => i.uniqueId === uniqueId)
 
       if (item) {
         item.tallas = item.tallas.filter((t) => t.talla !== talla)
         if (item.tallas.length === 0) {
-          state.cartItems = state.cartItems.filter((i) => i._id !== id)
+          state.cartItems = state.cartItems.filter((i) => i.uniqueId !== uniqueId)
         }
       }
     },

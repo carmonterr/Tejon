@@ -15,7 +15,7 @@ export const loadUserFromToken = createAsyncThunk('user/loadUserFromToken', asyn
     const token = localStorage.getItem('token')
     if (!token) throw new Error('No hay token')
 
-    const res = await api.get('/users/profile', {
+    const res = await api.get('api/users/profile', {
       headers: { Authorization: `Bearer ${token}` },
     })
 

@@ -1,5 +1,3 @@
-// src/pages/CartPage.jsx
-
 import React, { useState } from 'react'
 import {
   Container,
@@ -39,12 +37,12 @@ const CartPage = () => {
   const shipping = subtotal > 0 ? 9.99 : 0
   const total = subtotal + shipping
 
-  const handleQtyChange = (id, talla, qty) => {
-    dispatch(updateQty({ id, talla, qty }))
+  const handleQtyChange = (uniqueId, talla, qty) => {
+    dispatch(updateQty({ uniqueId, talla, qty }))
   }
 
-  const handleRemove = (id, talla) => {
-    dispatch(removeFromCart({ id, talla }))
+  const handleRemove = (uniqueId, talla) => {
+    dispatch(removeFromCart({ uniqueId, talla }))
     toast.info('Producto eliminado del carrito')
   }
 
@@ -52,7 +50,7 @@ const CartPage = () => {
     return cartItems.flatMap((item) =>
       item.tallas.map((t) => ({
         nombre: item.name,
-        talla: t.talla, // ✅ AÑADIMOS LA TALLA
+        talla: t.talla,
         precio: item.price,
         cantidad: t.qty,
       }))
@@ -75,7 +73,7 @@ const CartPage = () => {
         qty: t.qty,
         talla: t.talla,
         price: item.price,
-        image: Array.isArray(item.imagen) ? item.imagen[0]?.url : item.imagen,
+        image: item.imagen,
         product: item._id,
       }))
     )
@@ -116,9 +114,10 @@ const CartPage = () => {
           startIcon={<ArrowBackIosNewIcon />}
           sx={{ textTransform: 'none', borderRadius: 2 }}
         >
-          Agregar max
+          Volver al inicio
         </Button>
       </Box>
+
       <Typography variant="h4" gutterBottom>
         Tu Carrito
       </Typography>
@@ -127,13 +126,13 @@ const CartPage = () => {
         <Typography>No tienes productos en el carrito.</Typography>
       ) : (
         <Grid container spacing={4}>
-          <Grid xs={12} md={8}>
+          <Grid item xs={12} md={8}>
             {cartItems.map((item) => (
-              <Card key={item._id} sx={{ p: 2, mb: 3 }}>
+              <Card key={item.uniqueId} sx={{ p: 2, mb: 3 }}>
                 <Box display="flex" gap={2}>
                   <CardMedia
                     component="img"
-                    image={Array.isArray(item.imagen) ? item.imagen[0]?.url : item.imagen}
+                    image={item.imagen}
                     alt={item.name}
                     sx={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 1 }}
                   />
@@ -146,7 +145,7 @@ const CartPage = () => {
                           size="small"
                           value={t.qty}
                           onChange={(e) =>
-                            handleQtyChange(item._id, t.talla, parseInt(e.target.value))
+                            handleQtyChange(item.uniqueId, t.talla, parseInt(e.target.value))
                           }
                         >
                           {[...Array(10).keys()].map((x) => (
@@ -156,7 +155,10 @@ const CartPage = () => {
                           ))}
                         </Select>
                         <Typography>Subtotal: ${(t.qty * item.price).toLocaleString()}</Typography>
-                        <IconButton color="error" onClick={() => handleRemove(item._id, t.talla)}>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleRemove(item.uniqueId, t.talla)}
+                        >
                           <DeleteIcon />
                         </IconButton>
                       </Box>
@@ -167,7 +169,7 @@ const CartPage = () => {
             ))}
           </Grid>
 
-          <Grid xs={12} md={4}>
+          <Grid item xs={12} md={4}>
             <Card sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 Resumen de compra

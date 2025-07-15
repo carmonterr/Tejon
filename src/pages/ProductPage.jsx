@@ -53,9 +53,11 @@ const ProductPage = () => {
             inicial[t] = 0
           })
           setCantidadesPorTalla(inicial)
+        } else {
+          setCantidadesPorTalla({})
         }
       } catch (err) {
-        toast.error('Error al obtener el producto')
+        console.error('❌ Error al obtener el producto:', err)
       }
     }
 
@@ -78,7 +80,9 @@ const ProductPage = () => {
       }
     }
 
-    if (userInfo) verificarPermiso()
+    if (userInfo) {
+      verificarPermiso()
+    }
   }, [id, userInfo])
 
   const handleAddToCart = () => {
@@ -97,9 +101,17 @@ const ProductPage = () => {
       return
     }
 
+    // Generar uniqueId con imagen + tallas seleccionadas
+    const tallaKeys = tallas
+      .map((t) => t.talla)
+      .sort()
+      .join('-')
+    const uniqueId = `${product._id}-${currentImg}-${tallaKeys}`
+
     dispatch(
       addToCart({
         _id: product._id,
+        uniqueId,
         name: product.nombre,
         imagen: imagenes[currentImg]?.url,
         price: product.precio,
@@ -108,7 +120,7 @@ const ProductPage = () => {
     )
 
     toast.success('Producto añadido al carrito')
-    navigate('/cart')
+    //navigate('/cart')
   }
 
   const handleZoomOpen = (index) => {
@@ -186,36 +198,41 @@ const ProductPage = () => {
       </Box>
 
       <Grid container spacing={4} alignItems="flex-start" justifyContent="center">
-        {/* Imagen principal */}
         <Grid item xs={12} md={6}>
           <Box
+            component="img"
+            src={imagenes[currentImg]?.url}
+            alt={product.nombre}
+            onClick={() => handleZoomOpen(currentImg)}
             sx={{
               width: '100%',
-              height: 400,
               borderRadius: 2,
-              backgroundColor: '#f5f5f5',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              overflow: 'hidden',
+              objectFit: 'contain',
+              maxHeight: 400,
               cursor: 'zoom-in',
             }}
-            onClick={() => handleZoomOpen(currentImg)}
-          >
-            <Box
-              component="img"
-              src={imagenes[currentImg]?.url}
-              alt={product.nombre}
-              sx={{
-                maxHeight: '100%',
-                maxWidth: '100%',
-                objectFit: 'contain',
-              }}
-            />
+          />
+          <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+            {imagenes.map((img, idx) => (
+              <Box
+                key={idx}
+                component="img"
+                src={img.url}
+                alt={`Miniatura ${idx + 1}`}
+                onClick={() => setCurrentImg(idx)}
+                sx={{
+                  width: 60,
+                  height: 60,
+                  objectFit: 'cover',
+                  borderRadius: 1,
+                  border: idx === currentImg ? '2px solid #1976d2' : '1px solid #ccc',
+                  cursor: 'pointer',
+                }}
+              />
+            ))}
           </Box>
         </Grid>
 
-        {/* Detalles del producto */}
         <Grid item xs={12} md={6}>
           <Box
             sx={{ width: '100%', maxWidth: 420, p: 2, border: '1px solid #eee', borderRadius: 2 }}
@@ -264,31 +281,6 @@ const ProductPage = () => {
                 ({product.numCalificaciones || 0} opiniones) • {product.sold?.toLocaleString() || 0}{' '}
                 vendidos
               </Typography>
-            </Box>
-
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                Color: {product.color || 'No especificado'}
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                {imagenes.map((img, idx) => (
-                  <Box
-                    key={idx}
-                    component="img"
-                    src={img.url}
-                    alt={`Miniatura ${idx + 1}`}
-                    onClick={() => setCurrentImg(idx)}
-                    sx={{
-                      width: 60,
-                      height: 60,
-                      objectFit: 'cover',
-                      borderRadius: 1,
-                      border: idx === currentImg ? '2px solid #1976d2' : '1px solid #ccc',
-                      cursor: 'pointer',
-                    }}
-                  />
-                ))}
-              </Box>
             </Box>
 
             <Typography variant="h5" color="green" fontWeight="bold" sx={{ mt: 2 }}>
@@ -363,10 +355,11 @@ const ProductPage = () => {
                     await api.delete(`api/products/${product._id}/reviews/${review._id}`, {
                       headers: { Authorization: `Bearer ${token}` },
                     })
+
                     toast.success('Opinión eliminada')
                     const { data } = await api.get(`api/products/${product._id}`)
                     setProduct(data)
-                  } catch {
+                  } catch (err) {
                     toast.error('Error al eliminar opinión')
                   }
                 }}

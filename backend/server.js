@@ -20,7 +20,7 @@ dotenv.config()
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
-    credentials: true,
+    //credentials: false, // ✅ porque NO estás usando cookies
   })
 )
 

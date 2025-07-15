@@ -12,31 +12,41 @@ const ComprobantePedido = ({ pedido, user }) => {
 
   const handleDescargarPDF = async () => {
     const element = ref.current
-    const canvas = await html2canvas(element, { scale: 2, useCORS: true })
+
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      scrollY: -window.scrollY,
+      windowWidth: document.documentElement.scrollWidth,
+      windowHeight: document.documentElement.scrollHeight,
+    })
+
     const imgData = canvas.toDataURL('image/png')
     const pdf = new jsPDF('p', 'mm', 'a4')
     const pageWidth = pdf.internal.pageSize.getWidth()
 
     const logo = new Image()
-    logo.src = import.meta.env.BASE_URL + 'logo.png' // ✅ usa tu logo local
+    logo.src = import.meta.env.BASE_URL + 'logo.png'
 
     logo.onload = () => {
+      // Encabezado centrado en PDF
       const centerX = pageWidth / 2
-      pdf.addImage(logo, 'PNG', 15, 10, 20, 20)
+      pdf.addImage(logo, 'PNG', centerX - 10, 10, 20, 20)
 
-      pdf.setFontSize(18)
+      pdf.setFontSize(13)
       pdf.setFont('helvetica', 'bold')
-      pdf.text('Tienda MERN', centerX, 20, { align: 'center' })
-
-      pdf.setFontSize(12)
-      pdf.text('Comprobante de Pedido', centerX, 28, { align: 'center' })
+      pdf.text('Calzado CarMon - Comprobante de Pedido', centerX, 35, { align: 'center' })
 
       pdf.setLineWidth(0.2)
-      pdf.line(10, 32, pageWidth - 10, 32)
+      pdf.line(10, 40, pageWidth - 10, 40)
 
-      pdf.addImage(imgData, 'PNG', 10, 35, pageWidth - 20, 0)
+      const imgProps = pdf.getImageProperties(imgData)
+      const pdfWidth = pageWidth - 20
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
 
-      pdf.setFontSize(10)
+      pdf.addImage(imgData, 'PNG', 10, 45, pdfWidth, pdfHeight)
+
+      pdf.setFontSize(9)
       pdf.setTextColor(150)
       pdf.text(`Generado el ${new Date().toLocaleDateString()}`, 10, 290)
 
@@ -54,50 +64,31 @@ const ComprobantePedido = ({ pedido, user }) => {
       <Box
         ref={ref}
         sx={{
-          p: 4,
+          p: 2,
           maxWidth: '800px',
           mx: 'auto',
-          mt: 2,
+          mt: 1,
           backgroundColor: '#fff',
-          borderRadius: 2,
+          borderRadius: 1,
+          fontSize: 13,
         }}
       >
-        <Box sx={{ textAlign: 'center', mb: 2 }}>
-          <Box
-            component="img"
-            src="/logo.png"
-            alt="Logo Tienda"
-            sx={{
-              width: 64,
-              height: 64,
-              borderRadius: '50%',
-              objectFit: 'cover',
-              mx: 'auto',
-              mb: 1,
-            }}
-          />
-          <Typography variant="h6" fontWeight="bold" gutterBottom>
-            Calzado CarMon
-          </Typography>
-          <Typography variant="subtitle2" color="text.secondary">
-            Comprobante de Pedido
-          </Typography>
-        </Box>
+        {/* ✅ Ya no hay encabezado visual aquí */}
 
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="h6" gutterBottom>
+        {/* Info del Pedido */}
+        <Box sx={{ mb: 1 }}>
+          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
             Pedido #{pedido._id.slice(-6)}
           </Typography>
           <Box
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center',
               flexWrap: 'wrap',
               gap: 1,
             }}
           >
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 1 }}>
               <Chip
                 label={pedido.isPaid ? 'Pagado' : 'No pagado'}
                 color={pedido.isPaid ? 'success' : 'default'}
@@ -109,13 +100,14 @@ const ComprobantePedido = ({ pedido, user }) => {
                 size="small"
               />
             </Box>
-            <Typography sx={{ color: 'gray', fontSize: 13 }}>
+            <Typography sx={{ fontSize: 12 }}>
               Fecha: {new Date(pedido.createdAt).toLocaleDateString('es-ES')}
             </Typography>
           </Box>
         </Box>
 
-        <Box sx={{ mb: 3 }}>
+        {/* Cliente */}
+        <Box sx={{ mb: 1 }}>
           <Typography variant="subtitle2" gutterBottom>
             Datos del Cliente:
           </Typography>
@@ -133,9 +125,10 @@ const ComprobantePedido = ({ pedido, user }) => {
           </Typography>
         </Box>
 
-        <Grid container columns={12} spacing={3}>
-          <Grid item columnSpan={{ xs: 12, md: 8 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+        {/* Productos + Resumen */}
+        <Grid container spacing={1}>
+          <Grid item xs={12} md={8}>
+            <Typography variant="subtitle2" gutterBottom>
               Productos:
             </Typography>
             {Object.values(
@@ -150,7 +143,7 @@ const ComprobantePedido = ({ pedido, user }) => {
                   }
                 }
                 acc[key].tallas.push({
-                  talla: item.talla !== undefined ? item.talla : 'No especificada',
+                  talla: item.talla ?? 'No especificada',
                   qty: item.qty,
                   subtotal: item.qty * item.price,
                 })
@@ -158,57 +151,47 @@ const ComprobantePedido = ({ pedido, user }) => {
               }, {})
             ).map((producto, idx) => (
               <React.Fragment key={idx}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                   <Avatar
                     src={producto.image}
                     alt={producto.name}
                     variant="rounded"
-                    sx={{ width: 64, height: 64, mr: 2 }}
+                    sx={{ width: 48, height: 48, mr: 1 }}
                   />
                   <Box>
                     <Typography fontWeight="bold">{producto.name}</Typography>
-                    {producto.tallas.map((tallaItem, tallaIdx) => (
-                      <Typography key={tallaIdx}>
-                        Talla: {tallaItem.talla}, Cantidad: {tallaItem.qty}, Subtotal: $
-                        {tallaItem.subtotal.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                        })}
+                    {producto.tallas.map((t, i) => (
+                      <Typography key={i}>
+                        Talla: {t.talla}, Cant: {t.qty}, Subtotal: ${t.subtotal.toFixed(2)}
                       </Typography>
                     ))}
-                    <Typography>Precio unitario: ${producto.price.toLocaleString()}</Typography>
-                    <Typography fontWeight="bold">
-                      Subtotal:{' '}
-                      {producto.tallas
-                        .reduce((sum, talla) => sum + talla.subtotal, 0)
-                        .toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </Typography>
+                    <Typography fontSize={12}>Unit: ${producto.price.toFixed(2)}</Typography>
                   </Box>
                 </Box>
-                {idx < pedido.orderItems.length - 1 && <Divider sx={{ mb: 2 }} />}
+                {idx < pedido.orderItems.length - 1 && <Divider sx={{ mb: 1 }} />}
               </React.Fragment>
             ))}
           </Grid>
 
-          <Grid item columnSpan={{ xs: 12, md: 4 }}>
-            <Paper elevation={2} sx={{ p: 2 }}>
-              <Typography variant="subtitle1" gutterBottom>
-                Resumen del Pedido
+          <Grid item xs={12} md={4}>
+            <Paper elevation={1} sx={{ p: 1 }}>
+              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                Resumen
               </Typography>
               <Divider sx={{ mb: 1 }} />
-              <Typography>Total de Unidades: {totalUnidades}</Typography>
-              <Typography>
-                Subtotal: ${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-              </Typography>
+              <Typography>Total Unidades: {totalUnidades}</Typography>
+              <Typography>Subtotal: ${subtotal.toFixed(2)}</Typography>
               <Typography>Envío: ${pedido.shippingPrice?.toFixed(2) || '0.00'}</Typography>
-              <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
-                Total: ${pedido.totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              <Typography fontWeight="bold" color="primary">
+                Total: ${pedido.totalPrice.toFixed(2)}
               </Typography>
             </Paper>
           </Grid>
         </Grid>
       </Box>
 
-      <Box sx={{ mt: 3, textAlign: 'center' }}>
+      {/* Botón de descarga */}
+      <Box sx={{ mt: 2, textAlign: 'center' }}>
         <Button variant="contained" onClick={handleDescargarPDF} color="primary">
           Descargar comprobante en PDF
         </Button>
