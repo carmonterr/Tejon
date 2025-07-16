@@ -34,7 +34,7 @@ const CartPage = () => {
     return acc + sumPerProduct
   }, 0)
 
-  const shipping = subtotal > 0 ? 9.99 : 0
+  const shipping = subtotal > 0 ? 0.0 : 0
   const total = subtotal + shipping
 
   const handleQtyChange = (uniqueId, talla, qty) => {

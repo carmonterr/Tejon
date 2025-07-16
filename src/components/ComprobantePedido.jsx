@@ -16,7 +16,7 @@ import { jsPDF } from 'jspdf'
 import { toast } from 'react-toastify'
 import PropTypes from 'prop-types'
 
-// 🎨 PDF Theme
+// 🎨 Tema PDF
 const staticPDFTheme = createTheme({
   palette: {
     mode: 'light',
@@ -33,6 +33,14 @@ const staticPDFTheme = createTheme({
     fontSize: 12,
   },
 })
+
+// ✅ Función para formatear moneda colombiana
+const formatearMoneda = (numero) =>
+  new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 2,
+  }).format(numero)
 
 const ComprobantePedido = ({ pedido, user }) => {
   const ref = useRef()
@@ -176,7 +184,7 @@ const ComprobantePedido = ({ pedido, user }) => {
             </Typography>
           </Box>
 
-          {/* Datos del Cliente */}
+          {/* Cliente */}
           <Box sx={{ mb: 1 }}>
             <Typography variant="subtitle2" gutterBottom>
               Datos del Cliente:
@@ -195,7 +203,7 @@ const ComprobantePedido = ({ pedido, user }) => {
             </Typography>
           </Box>
 
-          {/* Productos agrupados y ordenados por subtotal */}
+          {/* Productos agrupados */}
           <Grid container spacing={1}>
             <Grid item xs={12} md={8}>
               <Typography variant="subtitle2" gutterBottom>
@@ -225,28 +233,40 @@ const ComprobantePedido = ({ pedido, user }) => {
                   const total = producto.tallas.reduce((acc, t) => acc + t.subtotal, 0)
                   return { ...producto, total }
                 })
-                .sort((a, b) => b.total - a.total) // orden por subtotal
+                .sort((a, b) => b.total - a.total)
                 .map((producto, idx) => (
-                  <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                  <Box
+                    key={idx}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      mb: 2,
+                      p: 1.5,
+                      backgroundColor: '#e3f2fd',
+                      borderRadius: 1,
+                    }}
+                  >
                     <Avatar
                       src={producto.image}
                       alt={producto.name}
                       variant="rounded"
-                      sx={{ width: 48, height: 48, mr: 1 }}
+                      sx={{ width: 48, height: 48, mr: 2 }}
                     />
                     <Box>
                       <Typography fontWeight="bold">{producto.name}</Typography>
-                      <Typography fontSize={12}>Tallas:</Typography>
+                      <Typography fontSize={12} fontWeight="medium">
+                        Tallas:
+                      </Typography>
                       {producto.tallas.map((t, i) => (
                         <Typography key={i} fontSize={12}>
                           - {t.talla}: {t.qty}
                         </Typography>
                       ))}
                       <Typography fontSize={12}>
-                        Precio unitario: ${producto.price.toFixed(2)}
+                        Precio unitario: {formatearMoneda(producto.price)}
                       </Typography>
                       <Typography fontSize={12} fontWeight="bold">
-                        Subtotal: ${producto.total.toFixed(2)}
+                        Subtotal: {formatearMoneda(producto.total)}
                       </Typography>
                     </Box>
                   </Box>
@@ -255,16 +275,24 @@ const ComprobantePedido = ({ pedido, user }) => {
 
             {/* Resumen */}
             <Grid item xs={12} md={4}>
-              <Paper elevation={1} sx={{ p: 1 }}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: 1,
+                  border: '1px solid #ddd',
+                }}
+              >
                 <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                   Resumen
                 </Typography>
                 <Divider sx={{ mb: 1 }} />
                 <Typography>Total Unidades: {totalUnidades}</Typography>
-                <Typography>Subtotal: ${subtotal.toFixed(2)}</Typography>
-                <Typography>Envío: ${pedido.shippingPrice?.toFixed(2)}</Typography>
+                <Typography>Subtotal: {formatearMoneda(subtotal)}</Typography>
+                <Typography>Envío: {formatearMoneda(pedido.shippingPrice)}</Typography>
                 <Typography fontWeight="bold" color="primary">
-                  Total: ${pedido.totalPrice.toFixed(2)}
+                  Total: {formatearMoneda(pedido.totalPrice)}
                 </Typography>
               </Paper>
             </Grid>
