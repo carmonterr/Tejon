@@ -1,93 +1,164 @@
-import React, { useRef } from 'react'
-import { Typography, Box, Divider, Chip, Grid, Avatar, Paper, Button } from '@mui/material'
+import React, { useRef, useState } from 'react'
+import {
+  Typography,
+  Box,
+  Divider,
+  Chip,
+  Grid,
+  Avatar,
+  Paper,
+  Button,
+  ThemeProvider,
+  createTheme,
+} from '@mui/material'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
 import { toast } from 'react-toastify'
 import PropTypes from 'prop-types'
 
+// 🎨 PDF Theme
+const staticPDFTheme = createTheme({
+  palette: {
+    mode: 'light',
+    background: {
+      default: '#ffffff',
+      paper: '#ffffff',
+    },
+    text: {
+      primary: '#000000',
+    },
+  },
+  typography: {
+    fontFamily: 'Arial, sans-serif',
+    fontSize: 12,
+  },
+})
+
 const ComprobantePedido = ({ pedido, user }) => {
+  const ref = useRef()
+  const [ocultarBoton, setOcultarBoton] = useState(false)
+
   const subtotal = pedido.totalPrice - pedido.shippingPrice
   const totalUnidades = pedido.orderItems.reduce((acc, item) => acc + item.qty, 0)
-  const ref = useRef()
 
   const handleDescargarPDF = async () => {
+    setOcultarBoton(true)
+    await new Promise((r) => setTimeout(r, 100))
+
     const element = ref.current
 
-    const canvas = await html2canvas(element, {
+    const originalCanvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
+      backgroundColor: '#ffffff',
       scrollY: -window.scrollY,
-      windowWidth: document.documentElement.scrollWidth,
-      windowHeight: document.documentElement.scrollHeight,
+      windowWidth: element.scrollWidth,
+      windowHeight: element.scrollHeight,
     })
 
-    const imgData = canvas.toDataURL('image/png')
+    const imgProps = {
+      width: originalCanvas.width,
+      height: originalCanvas.height,
+    }
+
     const pdf = new jsPDF('p', 'mm', 'a4')
     const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+    const margin = 10
+    const pdfContentWidth = pageWidth - margin * 2
+    const ratio = pdfContentWidth / imgProps.width
+    const scaledHeight = imgProps.height * ratio
 
-    const logo = new Image()
-    logo.src = import.meta.env.BASE_URL + 'logo.png'
+    const totalPages = Math.ceil(scaledHeight / (pageHeight - 20))
+    const sliceHeight = (originalCanvas.height / scaledHeight) * (pageHeight - 20)
 
-    logo.onload = () => {
-      // Encabezado centrado en PDF
-      const centerX = pageWidth / 2
-      pdf.addImage(logo, 'PNG', centerX - 10, 10, 20, 20)
+    for (let i = 0; i < totalPages; i++) {
+      if (i > 0) pdf.addPage()
 
-      pdf.setFontSize(13)
-      pdf.setFont('helvetica', 'bold')
-      pdf.text('Calzado CarMon - Comprobante de Pedido', centerX, 35, { align: 'center' })
+      const sliceCanvas = document.createElement('canvas')
+      const sliceContext = sliceCanvas.getContext('2d')
 
-      pdf.setLineWidth(0.2)
-      pdf.line(10, 40, pageWidth - 10, 40)
+      sliceCanvas.width = originalCanvas.width
+      sliceCanvas.height = sliceHeight
 
-      const imgProps = pdf.getImageProperties(imgData)
-      const pdfWidth = pageWidth - 20
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
+      sliceContext.drawImage(
+        originalCanvas,
+        0,
+        i * sliceHeight,
+        originalCanvas.width,
+        sliceHeight,
+        0,
+        0,
+        originalCanvas.width,
+        sliceHeight
+      )
 
-      pdf.addImage(imgData, 'PNG', 10, 45, pdfWidth, pdfHeight)
+      const imgData = sliceCanvas.toDataURL('image/png')
+      const imgHeightInPDF = (sliceCanvas.height * pdfContentWidth) / sliceCanvas.width
 
-      pdf.setFontSize(9)
+      if (i === 0) {
+        const logo = new Image()
+        logo.src = import.meta.env.BASE_URL + 'logo.png'
+        await new Promise((res) => {
+          logo.onload = res
+          logo.onerror = () => {
+            toast.error('❌ Error al cargar el logo desde /public/logo.png')
+            res()
+          }
+        })
+        pdf.addImage(logo, 'PNG', margin, 10, 15, 15)
+        pdf.setFontSize(11)
+        pdf.setFont('helvetica', 'bold')
+        pdf.text('Comprobante de Pedido', pageWidth - margin, 18, { align: 'right' })
+
+        pdf.setLineWidth(0.2)
+        pdf.line(margin, 25, pageWidth - margin, 25)
+
+        pdf.addImage(imgData, 'PNG', margin, 30, pdfContentWidth, imgHeightInPDF)
+      } else {
+        pdf.addImage(imgData, 'PNG', margin, 10, pdfContentWidth, imgHeightInPDF)
+      }
+
+      // Footer
+      pdf.setFontSize(8)
       pdf.setTextColor(150)
-      pdf.text(`Generado el ${new Date().toLocaleDateString()}`, 10, 290)
+      pdf.text(`Página ${i + 1} de ${totalPages}`, pageWidth - margin, pageHeight - 5, {
+        align: 'right',
+      })
 
-      pdf.save(`pedido_${pedido._id.slice(-6)}.pdf`)
-      toast.success('📄 PDF generado correctamente')
+      if (i === totalPages - 1) {
+        pdf.text(`Generado el ${new Date().toLocaleDateString()}`, margin, pageHeight - 5)
+      }
     }
 
-    logo.onerror = () => {
-      toast.error('❌ Error al cargar el logo desde /public/logo.png')
-    }
+    pdf.save(`pedido_${pedido._id.slice(-6)}.pdf`)
+    toast.success('📄 PDF generado correctamente')
+    setOcultarBoton(false)
   }
 
   return (
     <>
-      <Box
-        ref={ref}
-        sx={{
-          p: 2,
-          maxWidth: '800px',
-          mx: 'auto',
-          mt: 1,
-          backgroundColor: '#fff',
-          borderRadius: 1,
-          fontSize: 13,
-        }}
-      >
-        {/* ✅ Ya no hay encabezado visual aquí */}
-
-        {/* Info del Pedido */}
-        <Box sx={{ mb: 1 }}>
-          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+      <ThemeProvider theme={staticPDFTheme}>
+        <Box
+          ref={ref}
+          sx={{
+            p: 2,
+            maxWidth: '800px',
+            mx: 'auto',
+            mt: 1,
+            backgroundColor: 'background.paper',
+            color: 'text.primary',
+            borderRadius: 1,
+            fontSize: 12,
+            fontFamily: 'Arial, sans-serif',
+          }}
+        >
+          {/* Encabezado */}
+          <Typography variant="body1" fontWeight="bold" gutterBottom>
             Pedido #{pedido._id.slice(-6)}
           </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: 1,
-            }}
-          >
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', mb: 2 }}>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Chip
                 label={pedido.isPaid ? 'Pagado' : 'No pagado'}
@@ -100,102 +171,114 @@ const ComprobantePedido = ({ pedido, user }) => {
                 size="small"
               />
             </Box>
-            <Typography sx={{ fontSize: 12 }}>
+            <Typography sx={{ fontSize: 11 }}>
               Fecha: {new Date(pedido.createdAt).toLocaleDateString('es-ES')}
             </Typography>
           </Box>
-        </Box>
 
-        {/* Cliente */}
-        <Box sx={{ mb: 1 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            Datos del Cliente:
-          </Typography>
-          <Typography>
-            <strong>Nombre:</strong> {user.name}
-          </Typography>
-          <Typography>
-            <strong>Correo:</strong> {user.email}
-          </Typography>
-          <Typography>
-            <strong>Teléfono:</strong> {user.phone || 'No disponible'}
-          </Typography>
-          <Typography>
-            <strong>Dirección:</strong> {user.address || 'No proporcionada'}
-          </Typography>
-        </Box>
-
-        {/* Productos + Resumen */}
-        <Grid container spacing={1}>
-          <Grid item xs={12} md={8}>
+          {/* Datos del Cliente */}
+          <Box sx={{ mb: 1 }}>
             <Typography variant="subtitle2" gutterBottom>
-              Productos:
+              Datos del Cliente:
             </Typography>
-            {Object.values(
-              pedido.orderItems.reduce((acc, item) => {
-                const key = `${item.name}-${item.image}`
-                if (!acc[key]) {
-                  acc[key] = {
-                    name: item.name,
-                    image: item.image,
-                    price: item.price,
-                    tallas: [],
+            <Typography>
+              <strong>Nombre:</strong> {user.name}
+            </Typography>
+            <Typography>
+              <strong>Correo:</strong> {user.email}
+            </Typography>
+            <Typography>
+              <strong>Teléfono:</strong> {user.phone || 'No disponible'}
+            </Typography>
+            <Typography>
+              <strong>Dirección:</strong> {user.address || 'No proporcionada'}
+            </Typography>
+          </Box>
+
+          {/* Productos agrupados y ordenados por subtotal */}
+          <Grid container spacing={1}>
+            <Grid item xs={12} md={8}>
+              <Typography variant="subtitle2" gutterBottom>
+                Productos:
+              </Typography>
+
+              {Object.values(
+                pedido.orderItems.reduce((acc, item) => {
+                  const key = `${item.name}-${item.image}-${item.price}`
+                  if (!acc[key]) {
+                    acc[key] = {
+                      name: item.name,
+                      image: item.image,
+                      price: item.price,
+                      tallas: [],
+                    }
                   }
-                }
-                acc[key].tallas.push({
-                  talla: item.talla ?? 'No especificada',
-                  qty: item.qty,
-                  subtotal: item.qty * item.price,
+                  acc[key].tallas.push({
+                    talla: item.talla,
+                    qty: item.qty,
+                    subtotal: item.qty * item.price,
+                  })
+                  return acc
+                }, {})
+              )
+                .map((producto) => {
+                  const total = producto.tallas.reduce((acc, t) => acc + t.subtotal, 0)
+                  return { ...producto, total }
                 })
-                return acc
-              }, {})
-            ).map((producto, idx) => (
-              <React.Fragment key={idx}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <Avatar
-                    src={producto.image}
-                    alt={producto.name}
-                    variant="rounded"
-                    sx={{ width: 48, height: 48, mr: 1 }}
-                  />
-                  <Box>
-                    <Typography fontWeight="bold">{producto.name}</Typography>
-                    {producto.tallas.map((t, i) => (
-                      <Typography key={i}>
-                        Talla: {t.talla}, Cant: {t.qty}, Subtotal: ${t.subtotal.toFixed(2)}
+                .sort((a, b) => b.total - a.total) // orden por subtotal
+                .map((producto, idx) => (
+                  <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                    <Avatar
+                      src={producto.image}
+                      alt={producto.name}
+                      variant="rounded"
+                      sx={{ width: 48, height: 48, mr: 1 }}
+                    />
+                    <Box>
+                      <Typography fontWeight="bold">{producto.name}</Typography>
+                      <Typography fontSize={12}>Tallas:</Typography>
+                      {producto.tallas.map((t, i) => (
+                        <Typography key={i} fontSize={12}>
+                          - {t.talla}: {t.qty}
+                        </Typography>
+                      ))}
+                      <Typography fontSize={12}>
+                        Precio unitario: ${producto.price.toFixed(2)}
                       </Typography>
-                    ))}
-                    <Typography fontSize={12}>Unit: ${producto.price.toFixed(2)}</Typography>
+                      <Typography fontSize={12} fontWeight="bold">
+                        Subtotal: ${producto.total.toFixed(2)}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-                {idx < pedido.orderItems.length - 1 && <Divider sx={{ mb: 1 }} />}
-              </React.Fragment>
-            ))}
-          </Grid>
+                ))}
+            </Grid>
 
-          <Grid item xs={12} md={4}>
-            <Paper elevation={1} sx={{ p: 1 }}>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                Resumen
-              </Typography>
-              <Divider sx={{ mb: 1 }} />
-              <Typography>Total Unidades: {totalUnidades}</Typography>
-              <Typography>Subtotal: ${subtotal.toFixed(2)}</Typography>
-              <Typography>Envío: ${pedido.shippingPrice?.toFixed(2) || '0.00'}</Typography>
-              <Typography fontWeight="bold" color="primary">
-                Total: ${pedido.totalPrice.toFixed(2)}
-              </Typography>
-            </Paper>
+            {/* Resumen */}
+            <Grid item xs={12} md={4}>
+              <Paper elevation={1} sx={{ p: 1 }}>
+                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                  Resumen
+                </Typography>
+                <Divider sx={{ mb: 1 }} />
+                <Typography>Total Unidades: {totalUnidades}</Typography>
+                <Typography>Subtotal: ${subtotal.toFixed(2)}</Typography>
+                <Typography>Envío: ${pedido.shippingPrice?.toFixed(2)}</Typography>
+                <Typography fontWeight="bold" color="primary">
+                  Total: ${pedido.totalPrice.toFixed(2)}
+                </Typography>
+              </Paper>
+            </Grid>
           </Grid>
-        </Grid>
-      </Box>
+        </Box>
+      </ThemeProvider>
 
-      {/* Botón de descarga */}
-      <Box sx={{ mt: 2, textAlign: 'center' }}>
-        <Button variant="contained" onClick={handleDescargarPDF} color="primary">
-          Descargar comprobante en PDF
-        </Button>
-      </Box>
+      {!ocultarBoton && (
+        <Box sx={{ mt: 2, textAlign: 'center' }}>
+          <Button variant="contained" onClick={handleDescargarPDF} color="primary">
+            Descargar comprobante en PDF
+          </Button>
+        </Box>
+      )}
     </>
   )
 }
@@ -207,7 +290,6 @@ ComprobantePedido.propTypes = {
     shippingPrice: PropTypes.number.isRequired,
     isPaid: PropTypes.bool,
     isDelivered: PropTypes.bool,
-    deliveredAt: PropTypes.string,
     createdAt: PropTypes.string,
     orderItems: PropTypes.arrayOf(
       PropTypes.shape({
