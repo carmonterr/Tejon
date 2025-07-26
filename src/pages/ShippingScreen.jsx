@@ -1,4 +1,3 @@
-// src/pages/ShippingScreen.jsx
 import React, { useState, useEffect } from 'react'
 import { Container, Typography, TextField, Grid, Button, Alert } from '@mui/material'
 import API from '../api/axios'
@@ -28,7 +27,9 @@ const ShippingScreen = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const token = localStorage.getItem('token')
+        const user = JSON.parse(localStorage.getItem('user'))
+        const token = user?.token
+
         const { data } = await API.get('/api/users/profile', {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -55,17 +56,26 @@ const ShippingScreen = () => {
     e.preventDefault()
     setError(null)
 
-    const isEmpty = (val) => typeof val !== 'string' || val.trim() === ''
-
     const { phone, address, city, country } = formData
-    if ([phone, address, city, country].some(isEmpty)) {
-      setError('⚠️ Todos los campos son obligatorios y no pueden estar vacíos')
+
+    if (
+      typeof phone !== 'string' ||
+      phone.trim() === '' ||
+      typeof address !== 'string' ||
+      address.trim() === '' ||
+      typeof city !== 'string' ||
+      city.trim() === '' ||
+      typeof country !== 'string' ||
+      country.trim() === ''
+    ) {
+      setError('⚠️ Todos los campos son obligatorios')
       return
     }
 
     try {
       setLoading(true)
-      const token = localStorage.getItem('token')
+      const user = JSON.parse(localStorage.getItem('user'))
+      const token = user?.token
 
       await API.patch('/api/users/profile', formData, {
         headers: { Authorization: `Bearer ${token}` },

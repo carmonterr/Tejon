@@ -1,0 +1,23 @@
+# Forzar saltos de línea tipo LF en todo el proyecto
+* text=auto eol=lf
+
+# Evitar que Git toque archivos binarios
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg binary
+*.ico binary
+*.pdf binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+
+# Archivos minificados que deben quedar intactos
+*.min.js text
+*.min.css text
+
+# Archivos multimedia (por si hay)
+*.mp4 binary
+*.mp3 binary
