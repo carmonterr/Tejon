@@ -395,8 +395,6 @@ export const resetPassword = asyncHandler(async (req, res) => {
 // controllers/userController.js
 
 export const updateUserProfile = asyncHandler(async (req, res) => {
-  console.log('📩 Datos recibidos en PATCH /profile:', req.body)
-
   const user = await User.findById(req.user._id)
 
   if (!user) {

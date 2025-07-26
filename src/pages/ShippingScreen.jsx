@@ -81,8 +81,8 @@ const ShippingScreen = () => {
 
       await API.patch('/api/users/profile', formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
       })
 
