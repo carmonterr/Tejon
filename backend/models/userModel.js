@@ -5,8 +5,6 @@ const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    phone: String,
-    address: String,
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
 
@@ -18,26 +16,19 @@ const userSchema = new mongoose.Schema(
     resetPasswordToken: String,
     resetPasswordExpires: Date,
 
-    loginAttempts: {
-      type: Number,
-      default: 0,
-    },
-    loginLastAttempt: {
-      type: Date,
-      default: null,
-    },
-    loginBlockedUntil: {
-      type: Date,
-      default: null,
-    },
+    loginAttempts: { type: Number, default: 0 },
+    loginLastAttempt: { type: Date, default: null },
+    loginBlockedUntil: { type: Date, default: null },
 
-    resetPasswordAttempts: {
-      type: Number,
-      default: 0,
-    },
-    resetPasswordLastAttempt: {
-      type: Date,
-      default: null,
+    resetPasswordAttempts: { type: Number, default: 0 },
+    resetPasswordLastAttempt: { type: Date, default: null },
+
+    // 📦 Nuevos campos: datos de envío del usuario
+    phone: { type: String, default: '' },
+    shippingAddress: {
+      address: { type: String, required: true },
+      city: { type: String, required: true },
+      country: { type: String, required: true },
     },
   },
   {
@@ -47,7 +38,7 @@ const userSchema = new mongoose.Schema(
 
 // ✅ Hashear la contraseña antes de guardar
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next() // Solo si la contraseña fue modificada
+  if (!this.isModified('password')) return next()
   this.password = await bcrypt.hash(this.password, 10)
   next()
 })

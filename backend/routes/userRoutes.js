@@ -10,6 +10,7 @@ import {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  updateUserProfile,
 } from '../controllers/userController.js'
 import { protect, isAdmin } from '../middleware/authMiddleware.js'
 import { registerValidation } from '../validators/authValidators.js'
@@ -26,6 +27,7 @@ router.post('/reset-password/:token', resetPassword)
 
 // rutas privadas
 router.get('/profile', protect, getProfile)
+router.patch('/profile', protect, updateUserProfile)
 
 // rutas de administración
 router.get('/', protect, isAdmin, getUsers)

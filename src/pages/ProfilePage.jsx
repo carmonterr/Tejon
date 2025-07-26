@@ -32,10 +32,16 @@ const ProfilePage = () => {
           <strong>Email:</strong> {user.email}
         </Typography>
         <Typography>
-          <strong>Teléfono:</strong> {user.phone}
+          <strong>Teléfono:</strong> {user.phone || 'No registrado'}
         </Typography>
         <Typography>
-          <strong>Dirección:</strong> {user.address}
+          <strong>Dirección:</strong> {user.shippingAddress?.address || 'No registrada'}
+        </Typography>
+        <Typography>
+          <strong>Ciudad:</strong> {user.shippingAddress?.city || 'No registrada'}
+        </Typography>
+        <Typography>
+          <strong>País:</strong> {user.shippingAddress?.country || 'No registrado'}
         </Typography>
 
         <Button variant="contained" color="error" sx={{ mt: 3 }} onClick={handleLogout}>

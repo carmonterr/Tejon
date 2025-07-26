@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Container,
   Typography,
@@ -28,13 +28,19 @@ const CartPage = () => {
   const { cartItems } = useSelector((state) => state.cart)
 
   const [openConfirm, setOpenConfirm] = useState(false)
+  const [shippingAddress, setShippingAddress] = useState(null)
+
+  useEffect(() => {
+    const address = JSON.parse(localStorage.getItem('shippingAddress'))
+    setShippingAddress(address)
+  }, [])
 
   const subtotal = cartItems.reduce((acc, item) => {
     const sumPerProduct = item.tallas.reduce((acc2, t) => acc2 + item.price * t.qty, 0)
     return acc + sumPerProduct
   }, 0)
 
-  const shipping = subtotal > 0 ? 0.0 : 0
+  const shipping = subtotal > 0 ? 9.99 : 0
   const total = subtotal + shipping
 
   const handleQtyChange = (uniqueId, talla, qty) => {
@@ -67,6 +73,12 @@ const CartPage = () => {
       return
     }
 
+    if (!shippingAddress) {
+      toast.error('❌ Faltan los datos de envío. Complétalos antes de confirmar.')
+      navigate('/shipping')
+      return
+    }
+
     const orderItems = cartItems.flatMap((item) =>
       item.tallas.map((t) => ({
         name: item.name,
@@ -83,6 +95,7 @@ const CartPage = () => {
         'api/orders',
         {
           orderItems,
+          shippingAddress,
           shippingPrice: shipping,
           totalPrice: total,
         },
@@ -92,6 +105,7 @@ const CartPage = () => {
           },
         }
       )
+
       toast.success('✅ Pedido realizado correctamente')
       dispatch(clearCart())
       navigate('/pedido-exitoso')
@@ -186,7 +200,14 @@ const CartPage = () => {
                 color="primary"
                 fullWidth
                 sx={{ mt: 2 }}
-                onClick={() => setOpenConfirm(true)}
+                onClick={() => {
+                  if (!shippingAddress) {
+                    toast.info('Primero debes ingresar los datos de envío')
+                    navigate('/shipping')
+                  } else {
+                    setOpenConfirm(true)
+                  }
+                }}
               >
                 Realizar pedido
               </Button>
@@ -212,6 +233,7 @@ const CartPage = () => {
         onClose={() => setOpenConfirm(false)}
         onConfirm={handleConfirmarPedido}
         carrito={transformCartItems()}
+        direccion={shippingAddress}
       />
     </Container>
   )

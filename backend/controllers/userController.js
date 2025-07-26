@@ -9,7 +9,7 @@ import ApiError from '../utils/ApiError.js'
 
 // ✅ Registro de usuario
 export const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, phone, address, password } = req.body
+  const { name, email, password } = req.body
 
   // 🔍 Verificar si el correo ya está registrado
   const existingUser = await User.findOne({ email })
@@ -25,8 +25,6 @@ export const registerUser = asyncHandler(async (req, res) => {
   const user = await User.create({
     name,
     email,
-    phone,
-    address,
     password,
     isVerified: false,
     verificationCode,
@@ -106,7 +104,6 @@ export const loginUser = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email })
 
-  // ❌ Usuario no encontrado
   if (!user) {
     throw new ApiError(
       '❌ Error: El correo o la contraseña no son correctos. Verifica tus credenciales.',
@@ -115,7 +112,6 @@ export const loginUser = asyncHandler(async (req, res) => {
     )
   }
 
-  // ⚠️ Usuario no verificado por correo
   if (!user.isVerified) {
     throw new ApiError(
       '⚠️ Debes verificar tu cuenta antes de iniciar sesión. Revisa tu correo.',
@@ -124,7 +120,6 @@ export const loginUser = asyncHandler(async (req, res) => {
     )
   }
 
-  // 🔒 Comprobar si el usuario está bloqueado por intentos
   if (user.loginBlockedUntil && user.loginBlockedUntil > Date.now()) {
     throw new ApiError(
       '🚫 Demasiados intentos fallidos. Intenta nuevamente en unos minutos.',
@@ -136,7 +131,6 @@ export const loginUser = asyncHandler(async (req, res) => {
     )
   }
 
-  // 🔐 Verificar contraseña
   const isMatch = await bcrypt.compare(password, user.password)
 
   if (!isMatch) {
@@ -144,12 +138,11 @@ export const loginUser = asyncHandler(async (req, res) => {
     user.loginLastAttempt = new Date()
 
     if (user.loginAttempts >= 5) {
-      user.loginBlockedUntil = new Date(Date.now() + 10 * 60 * 1000) // 🔒 Bloquear por 10 minutos
+      user.loginBlockedUntil = new Date(Date.now() + 10 * 60 * 1000)
     }
 
     await user.save()
 
-    // Si ya está bloqueado por los intentos anteriores
     if (user.loginBlockedUntil && user.loginBlockedUntil > Date.now()) {
       throw new ApiError(
         '🚫 Has alcanzado el límite de intentos. Intenta nuevamente en 10 minutos.',
@@ -168,24 +161,21 @@ export const loginUser = asyncHandler(async (req, res) => {
     )
   }
 
-  // ✅ Login correcto: reiniciar contador y desbloqueo
   user.loginAttempts = 0
   user.loginBlockedUntil = null
   await user.save()
 
   console.log(`✔️ Inicio de sesión exitoso para ${user.email}`)
 
-  // 🎟️ Enviar datos al cliente
   res.json({
     _id: user._id,
     name: user.name,
     email: user.email,
-    phone: user.phone || '',
-    address: user.address || '',
     isAdmin: user.isAdmin || false,
     token: generateToken(user._id),
   })
 })
+
 // ✅ Perfil del usuario
 // ✅ Obtener perfil del usuario autenticado
 export const getProfile = asyncHandler(async (req, res) => {
@@ -269,12 +259,10 @@ export const updateUser = asyncHandler(async (req, res) => {
     )
   }
 
-  const { name, email, phone, address, isAdmin } = req.body
+  const { name, email, isAdmin } = req.body
 
   if (name !== undefined) user.name = name
   if (email !== undefined) user.email = email
-  if (phone !== undefined) user.phone = phone
-  if (address !== undefined) user.address = address
   if (isAdmin !== undefined) user.isAdmin = isAdmin
 
   const updatedUser = await user.save()
@@ -285,8 +273,6 @@ export const updateUser = asyncHandler(async (req, res) => {
     _id: updatedUser._id,
     name: updatedUser.name,
     email: updatedUser.email,
-    phone: updatedUser.phone,
-    address: updatedUser.address,
     isAdmin: updatedUser.isAdmin,
     message: '✅ Usuario actualizado correctamente.',
   })
@@ -402,5 +388,43 @@ export const resetPassword = asyncHandler(async (req, res) => {
 
   res.json({
     message: '✅ Contraseña actualizada correctamente. Ya puedes iniciar sesión.',
+  })
+})
+
+// ✅ Actualiza el perfil del usuario autenticado
+// controllers/userController.js
+
+export const updateUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id)
+
+  if (!user) {
+    throw new ApiError('❌ Usuario no encontrado', 404, 'USER_NOT_FOUND')
+  }
+
+  const { phone, address, city, country } = req.body
+
+  // Validación fuerte para evitar campos vacíos
+  if (!phone?.trim() || !address?.trim() || !city?.trim() || !country?.trim()) {
+    throw new ApiError('❌ Todos los campos de dirección son obligatorios.', 400, 'FIELDS_REQUIRED')
+  }
+
+  user.phone = phone
+  user.shippingAddress = {
+    address: address.trim(),
+    city: city.trim(),
+    country: country.trim(),
+  }
+
+  const updatedUser = await user.save()
+
+  res.status(200).json({
+    message: '✅ Perfil actualizado correctamente.',
+    user: {
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      phone: updatedUser.phone,
+      shippingAddress: updatedUser.shippingAddress,
+    },
   })
 })

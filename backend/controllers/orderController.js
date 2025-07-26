@@ -12,14 +12,39 @@ export const createdOrder = asyncHandler(async (req, res) => {
     throw new ApiError('❌ No hay productos en el pedido', 400, 'ORDER_ITEMS_REQUIRED')
   }
 
+  const user = await User.findById(req.user._id)
+
+  if (
+    !user ||
+    !user.shippingAddress ||
+    !user.shippingAddress.address?.trim() ||
+    !user.shippingAddress.city?.trim() ||
+    !user.shippingAddress.country?.trim() ||
+    !user.phone?.trim()
+  ) {
+    throw new ApiError(
+      '❌ Falta información de envío en el perfil del usuario',
+      400,
+      'SHIPPING_INFO_MISSING'
+    )
+  }
+
   const newOrder = new Order({
     user: req.user._id,
     orderItems,
+    shippingAddress: {
+      address: user.shippingAddress.address,
+      city: user.shippingAddress.city,
+      country: user.shippingAddress.country,
+      phone: user.phone,
+    },
     shippingPrice,
     totalPrice,
   })
 
   const createdOrder = await newOrder.save()
+  console.log('✅ Orden guardada:', createdOrder)
+
   res.status(201).json(createdOrder)
 })
 

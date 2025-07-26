@@ -97,7 +97,7 @@ const Home = () => {
           sx={{
             display: 'grid',
             gridTemplateColumns: {
-              xs: 'repeat(1, 1fr)',
+              xs: 'repeat(2, 1fr)', // ✅ Dos columnas en móvil
               sm: 'repeat(2, 1fr)',
               lg: 'repeat(4, 1fr)',
             },
@@ -116,7 +116,7 @@ const Home = () => {
             sx={{
               display: 'grid',
               gridTemplateColumns: {
-                xs: 'repeat(1, 1fr)',
+                xs: 'repeat(2, 1fr)', // ✅ Dos columnas en móvil
                 sm: 'repeat(2, 1fr)',
                 lg: 'repeat(4, 1fr)',
               },

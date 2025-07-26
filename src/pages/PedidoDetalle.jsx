@@ -1,7 +1,7 @@
 // src/pages/PedidoDetalle.jsx
 import React, { useEffect, useState } from 'react'
-import { Typography, Box, CircularProgress, Chip, Stack, Divider } from '@mui/material'
-import { useParams } from 'react-router-dom'
+import { Typography, Box, CircularProgress, Chip, Stack, Divider, Button } from '@mui/material'
+import { Link, useParams } from 'react-router-dom'
 
 import API from '../api/axios'
 import { toast } from 'react-toastify'
@@ -85,6 +85,12 @@ const PedidoDetalle = () => {
       <Divider sx={{ mb: 3 }} />
 
       <ComprobantePedido pedido={pedido} user={user} />
+
+      <Box textAlign="center">
+        <Button variant="outlined" component={Link} to="/admin/orders" sx={{ mt: 3 }}>
+          ← Volver a la lista
+        </Button>
+      </Box>
     </Box>
   )
 }

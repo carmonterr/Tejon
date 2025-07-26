@@ -9,11 +9,12 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Box,
 } from '@mui/material'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import PropTypes from 'prop-types'
 
-const ModalPedido = ({ open, onClose, carrito, onConfirm }) => {
+const ModalPedido = ({ open, onClose, carrito, onConfirm, direccion }) => {
   const subtotal = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0)
   const envio = 9.99
   const total = subtotal + envio
@@ -25,11 +26,13 @@ const ModalPedido = ({ open, onClose, carrito, onConfirm }) => {
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <CheckCircleOutlineIcon color="primary" /> Confirmar Pedido
       </DialogTitle>
+
       <DialogContent>
         <Typography variant="body1" sx={{ mb: 2 }}>
           Estás a punto de confirmar tu pedido. Por favor verifica los detalles:
         </Typography>
 
+        {/* 🛍 Lista de productos */}
         <List>
           {carrito.map((item, index) => (
             <ListItem key={index} sx={{ pl: 0 }}>
@@ -45,6 +48,28 @@ const ModalPedido = ({ open, onClose, carrito, onConfirm }) => {
 
         <Divider sx={{ my: 2 }} />
 
+        {/* 📦 Dirección de envío */}
+        <Typography variant="h6" gutterBottom>
+          Dirección de envío:
+        </Typography>
+        <Box sx={{ pl: 1 }}>
+          <Typography>
+            <strong>Teléfono:</strong> {direccion?.phone || 'No disponible'}
+          </Typography>
+          <Typography>
+            <strong>Dirección:</strong> {direccion?.address || 'No disponible'}
+          </Typography>
+          <Typography>
+            <strong>Ciudad:</strong> {direccion?.city || 'No disponible'}
+          </Typography>
+          <Typography>
+            <strong>País:</strong> {direccion?.country || 'No disponible'}
+          </Typography>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* 💲 Resumen */}
         <Typography variant="subtitle1">
           Total unidades: <strong>{totalUnidades}</strong>
         </Typography>
@@ -88,6 +113,12 @@ ModalPedido.propTypes = {
       cantidad: PropTypes.number.isRequired,
     })
   ).isRequired,
+  direccion: PropTypes.shape({
+    phone: PropTypes.string,
+    address: PropTypes.string,
+    city: PropTypes.string,
+    country: PropTypes.string,
+  }),
 }
 
 export default ModalPedido

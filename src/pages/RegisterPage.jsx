@@ -10,14 +10,12 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
-    address: '',
     password: '',
   })
 
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null) // error general
-  const [fieldErrors, setFieldErrors] = useState({}) // errores por campo
+  const [error, setError] = useState(null)
+  const [fieldErrors, setFieldErrors] = useState({})
   const [success, setSuccess] = useState(null)
 
   const handleChange = (e) => {
@@ -75,7 +73,7 @@ const RegisterPage = () => {
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           {/* Nombre */}
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12}>
             <TextField
               label="Nombre completo"
               name="name"
@@ -89,7 +87,7 @@ const RegisterPage = () => {
           </Grid>
 
           {/* Correo */}
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12}>
             <TextField
               label="Correo electrónico"
               name="email"
@@ -100,34 +98,6 @@ const RegisterPage = () => {
               onChange={handleChange}
               error={!!fieldErrors.email}
               helperText={fieldErrors.email}
-            />
-          </Grid>
-
-          {/* Teléfono */}
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Teléfono"
-              name="phone"
-              fullWidth
-              required
-              inputProps={{ maxLength: 10, inputMode: 'numeric', pattern: '[0-9]*' }}
-              value={formData.phone}
-              onChange={handleChange}
-              error={!!fieldErrors.phone}
-              helperText={fieldErrors.phone}
-            />
-          </Grid>
-
-          {/* Dirección */}
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Dirección"
-              name="address"
-              fullWidth
-              value={formData.address}
-              onChange={handleChange}
-              error={!!fieldErrors.address}
-              helperText={fieldErrors.address}
             />
           </Grid>
 

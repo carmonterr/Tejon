@@ -41,6 +41,7 @@ import Contacto from './pages/Contacto'
 import SobreNosotros from './pages/SobreNosotros'
 import PoliticaPrivacidad from './pages/PoliticaPrivacidad'
 import MainLayout from './components/layout/MainLayout'
+import ShippingScreen from './pages/ShippingScreen'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -68,6 +69,8 @@ const App = () => {
         <Route element={<MainLayout />}></Route>
         <Route path="/" element={<Home />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/shipping" element={<ShippingScreen />} />
+
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

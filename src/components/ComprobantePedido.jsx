@@ -196,10 +196,19 @@ const ComprobantePedido = ({ pedido, user }) => {
               <strong>Correo:</strong> {user.email}
             </Typography>
             <Typography>
-              <strong>Teléfono:</strong> {user.phone || 'No disponible'}
+              <strong>Teléfono:</strong>{' '}
+              {pedido?.shippingAddress?.phone
+                ? pedido.shippingAddress.phone
+                : user?.phone || 'No disponible'}
             </Typography>
+
             <Typography>
-              <strong>Dirección:</strong> {user.address || 'No proporcionada'}
+              <strong>Dirección:</strong>{' '}
+              {pedido?.shippingAddress?.address
+                ? `${pedido.shippingAddress.address}, ${pedido.shippingAddress.city}, ${pedido.shippingAddress.country}`
+                : user?.shippingAddress?.address
+                  ? `${user.shippingAddress.address}, ${user.shippingAddress.city}, ${user.shippingAddress.country}`
+                  : 'No proporcionada'}
             </Typography>
           </Box>
 
@@ -328,12 +337,22 @@ ComprobantePedido.propTypes = {
         talla: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       })
     ).isRequired,
+    shippingAddress: PropTypes.shape({
+      address: PropTypes.string,
+      city: PropTypes.string,
+      country: PropTypes.string,
+      phone: PropTypes.string,
+    }),
   }).isRequired,
   user: PropTypes.shape({
     name: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
     phone: PropTypes.string,
-    address: PropTypes.string,
+    shippingAddress: PropTypes.shape({
+      address: PropTypes.string,
+      city: PropTypes.string,
+      country: PropTypes.string,
+    }),
   }).isRequired,
 }
 
