@@ -77,11 +77,15 @@ const ShippingScreen = () => {
       const user = JSON.parse(localStorage.getItem('user'))
       const token = user?.token
 
+      console.log('👉 Enviando a backend:', formData) // 👈 IMPORTANTE para debug
+
       await API.patch('/api/users/profile', formData, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       })
 
-      // Abrir el modal con detalles del pedido
       setOpenModal(true)
     } catch (err) {
       console.error('❌ Error al guardar dirección:', err)
