@@ -1,14 +1,4 @@
-import {
-  Card,
-  CardContent,
-  Typography,
-  Rating,
-  Box,
-  Chip,
-  CardActionArea,
-  CardActions,
-  Button,
-} from '@mui/material'
+import { Card, CardContent, Typography, Rating, Box, Chip, CardActionArea } from '@mui/material'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
@@ -40,14 +30,18 @@ const ProductCard = ({ product }) => {
         },
       }}
     >
-      <CardActionArea component={Link} to={`/product/${product._id}`}>
-        {/* Imagen grande y destacada */}
+      <CardActionArea
+        component={Link}
+        to={`/product/${product._id}`}
+        sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+      >
+        {/* Imagen */}
         <Box
           component="img"
           src={getImageUrl()}
           alt={`Imagen del producto ${product.nombre}`}
           sx={{
-            height: 240,
+            height: { xs: 160, sm: 200, md: 240 },
             width: '100%',
             objectFit: 'cover',
             borderTopLeftRadius: 12,
@@ -55,33 +49,46 @@ const ProductCard = ({ product }) => {
           }}
         />
 
-        {/* Contenido compacto */}
-        <CardContent sx={{ px: 2, py: 1 }}>
-          <Typography
-            variant="subtitle1"
-            component="div"
-            fontWeight={600}
-            noWrap
-            title={product.nombre}
-          >
-            {product.nombre || 'Sin nombre'}
-          </Typography>
+        {/* Contenido */}
+        <CardContent
+          sx={{
+            flexGrow: 1,
+            px: 2,
+            py: 1.5,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            width: '100%',
+          }}
+        >
+          <Box>
+            <Typography
+              variant="subtitle1"
+              component="div"
+              fontWeight={600}
+              noWrap
+              title={product.nombre}
+            >
+              {product.nombre || 'Sin nombre'}
+            </Typography>
 
-          <Typography variant="body2" color="text.secondary" fontWeight={500} sx={{ mt: 0.2 }}>
-            ${!isNaN(product.precio) ? Number(product.precio).toLocaleString('es-CO') : '0'}
-          </Typography>
+            <Typography variant="body2" color="text.secondary" fontWeight={500} sx={{ mt: 0.2 }}>
+              ${!isNaN(product.precio) ? Number(product.precio).toLocaleString('es-CO') : '0'}
+            </Typography>
 
-          <Box mt={0.5} display="flex" alignItems="center" gap={0.5}>
-            <Rating value={product.calificacion || 0} precision={0.5} readOnly size="small" />
-            <Typography variant="caption" color="text.secondary">
-              ({product.numCalificaciones || 0})
+            <Box mt={0.5} display="flex" alignItems="center" gap={0.5}>
+              <Rating value={product.calificacion || 0} precision={0.5} readOnly size="small" />
+              <Typography variant="caption" color="text.secondary">
+                ({product.numCalificaciones || 0})
+              </Typography>
+            </Box>
+
+            <Typography variant="caption" color="text.secondary" display="block" mt={0.3}>
+              {product.sold > 0 ? `${product.sold}+ vendidos` : 'Sin ventas aún'}
             </Typography>
           </Box>
 
-          <Typography variant="caption" color="text.secondary" display="block" mt={0.3}>
-            {product.sold > 0 ? `${product.sold}+ vendidos` : 'Sin ventas aún'}
-          </Typography>
-
+          {/* Estado de stock */}
           {isOutOfStock ? (
             <Chip label="Agotado" color="error" size="small" sx={{ mt: 0.5 }} />
           ) : isLowStock ? (
@@ -89,19 +96,6 @@ const ProductCard = ({ product }) => {
           ) : null}
         </CardContent>
       </CardActionArea>
-
-      {/* Botón Ver más */}
-      <CardActions sx={{ justifyContent: 'center', pb: 2, pt: 0 }}>
-        <Button
-          size="small"
-          variant="outlined"
-          component={Link}
-          to={`/product/${product._id}`}
-          sx={{ borderRadius: 2, textTransform: 'none' }}
-        >
-          Ver más
-        </Button>
-      </CardActions>
     </Card>
   )
 }
