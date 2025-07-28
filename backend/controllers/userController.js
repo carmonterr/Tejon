@@ -38,8 +38,8 @@ export const registerUser = asyncHandler(async (req, res) => {
     text: `Hola ${name}, tu código de verificación es: ${verificationCode}`,
   })
 
-  console.log(`✔️ Usuario registrado: ${email}`)
-  console.log(`✔️ Código de verificación enviado: ${verificationCode}`)
+  console.log('✔️ Usuario registrado')
+  console.log('✔️ Código de verificación enviado')
 
   // ✅ Respuesta al cliente
   res.status(201).json({
@@ -92,7 +92,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 
   await user.save()
 
-  console.log(`✔️ Cuenta verificada: ${user.email}`)
+  console.log('✔️ Cuenta verificada')
 
   res.json({
     message: '✅ Tu cuenta ha sido verificada correctamente.',
@@ -165,7 +165,7 @@ export const loginUser = asyncHandler(async (req, res) => {
   user.loginBlockedUntil = null
   await user.save()
 
-  console.log(`✔️ Inicio de sesión exitoso para ${user.email}`)
+  console.log('✔️ Inicio de sesión exitoso')
 
   res.json({
     _id: user._id,
@@ -189,7 +189,7 @@ export const getProfile = asyncHandler(async (req, res) => {
     )
   }
 
-  console.log(`✔️ Perfil cargado correctamente para ${user.email}`)
+  console.log('✔️ Perfil cargado correctamente para')
 
   res.json(user)
 })
@@ -216,7 +216,7 @@ export const getUsers = asyncHandler(async (req, res) => {
     .skip((page - 1) * limit)
     .sort({ createdAt: -1 })
 
-  console.log(`✔️ Usuarios encontrados: ${users.length} de ${total}`)
+  console.log('✔️ Usuarios encontrados')
 
   res.json({
     users,
@@ -243,7 +243,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
 
   await user.deleteOne()
 
-  console.log(`✔️ Usuario eliminado: ${user.email}`)
+  console.log('✔️ Usuario eliminado')
 
   res.json({ message: '✅ Usuario eliminado correctamente.' })
 })
@@ -267,7 +267,7 @@ export const updateUser = asyncHandler(async (req, res) => {
 
   const updatedUser = await user.save()
 
-  console.log(`✔️ Usuario actualizado: ${updatedUser.email}`)
+  console.log('✔️ Usuario actualizado')
 
   res.status(200).json({
     _id: updatedUser._id,
@@ -347,9 +347,6 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     text: `Hola ${user.name},\n\nAccede a este enlace para recuperar tu contraseña:\n${resetUrl}\n\nEste enlace expirará en 40 minutos.`,
   })
 
-  console.log('📨 Token plano enviado:', rawToken)
-  console.log('🔐 Token guardado en Mongo:', hashedToken)
-
   res.json({
     message: '✅ Correo de recuperación enviado correctamente. Revisa tu bandeja de entrada.',
   })
@@ -361,7 +358,6 @@ export const resetPassword = asyncHandler(async (req, res) => {
   console.log('👉 Token plano recibido:', token)
   // 🔐 Hashear el token recibido
   const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
-  console.log('🔐 Token hasheado:', hashedToken)
 
   // 🔍 Buscar usuario con token hasheado y válido
   const user = await User.findOne({
@@ -384,7 +380,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
 
   await user.save()
 
-  console.log(`✔️ Contraseña actualizada para ${user.email}`)
+  console.log('✔️ Contraseña actualizada')
 
   res.json({
     message: '✅ Contraseña actualizada correctamente. Ya puedes iniciar sesión.',
@@ -404,8 +400,17 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
   const { phone, address, city, country } = req.body
 
   // Validación fuerte para evitar campos vacíos
-  if (!phone?.trim() || !address?.trim() || !city?.trim() || !country?.trim()) {
-    throw new ApiError('❌ Todos los campos de dirección son obligatorios.', 400, 'FIELDS_REQUIRED')
+  if (!phone?.trim()) {
+    throw new ApiError('❌ El teléfono es obligatorio.', 400, 'PHONE_REQUIRED')
+  }
+  if (!address?.trim()) {
+    throw new ApiError('❌ La dirección es obligatoria.', 400, 'ADDRESS_REQUIRED')
+  }
+  if (!city?.trim()) {
+    throw new ApiError('❌ La ciudad es obligatoria.', 400, 'CITY_REQUIRED')
+  }
+  if (!country?.trim()) {
+    throw new ApiError('❌ El país es obligatorio.', 400, 'COUNTRY_REQUIRED')
   }
 
   user.phone = phone

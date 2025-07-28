@@ -86,6 +86,7 @@ const ShippingScreen = () => {
         },
       })
 
+      toast.success('✅ Dirección guardada con éxito')
       setOpenModal(true)
     } catch (err) {
       console.error('❌ Error al guardar dirección:', err)

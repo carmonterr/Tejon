@@ -43,7 +43,6 @@ export const createdOrder = asyncHandler(async (req, res) => {
   })
 
   const createdOrder = await newOrder.save()
-  console.log('✅ Orden guardada:', createdOrder)
 
   res.status(201).json(createdOrder)
 })
