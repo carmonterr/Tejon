@@ -24,12 +24,12 @@ const userSchema = new mongoose.Schema(
     resetPasswordLastAttempt: { type: Date, default: null },
 
     // 📦 Nuevos campos: datos de envío del usuario
-    phone: { type: String, default: '' },
     shippingAddress: {
-      address: { type: String, required: true },
-      city: { type: String, required: true },
-      country: { type: String, required: true },
+      address: String,
+      city: String,
+      country: String,
     },
+    phone: String,
   },
   {
     timestamps: true,
