@@ -18,9 +18,12 @@ const ProductCard = ({ product }) => {
       sx={{
         width: '100%',
         maxWidth: 360,
-        margin: '0 auto',
+        mx: 'auto', // Centrado horizontal
+        my: 0, // Cero margen vertical
+        height: '100%', // Ocupa todo el alto disponible del grid
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'space-between', // Para empujar contenido
         borderRadius: 3,
         boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
@@ -41,7 +44,7 @@ const ProductCard = ({ product }) => {
           src={getImageUrl()}
           alt={`Imagen del producto ${product.nombre}`}
           sx={{
-            height: { xs: 160, sm: 200, md: 240 },
+            height: { xs: 140, sm: 160, md: 200 }, // 🔽 más compacta
             width: '100%',
             objectFit: 'cover',
             borderTopLeftRadius: 12,

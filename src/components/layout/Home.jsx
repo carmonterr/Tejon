@@ -97,11 +97,11 @@ const Home = () => {
           sx={{
             display: 'grid',
             gridTemplateColumns: {
-              xs: 'repeat(2, 1fr)', // ✅ Dos columnas en móvil
+              xs: 'repeat(2, 1fr)',
               sm: 'repeat(2, 1fr)',
               lg: 'repeat(4, 1fr)',
             },
-            gap: 4,
+            gap: { xs: 1.5, sm: 2, md: 3 }, // Espaciado más compacto
           }}
         >
           {Array.from({ length: 4 }).map((_, index) => (
@@ -116,15 +116,22 @@ const Home = () => {
             sx={{
               display: 'grid',
               gridTemplateColumns: {
-                xs: 'repeat(2, 1fr)', // ✅ Dos columnas en móvil
+                xs: 'repeat(2, 1fr)',
                 sm: 'repeat(2, 1fr)',
                 lg: 'repeat(4, 1fr)',
               },
-              gap: 4,
+              gap: { xs: 1.5, sm: 2, md: 3 }, // 💡 Antes tenías "gap: 4"
             }}
           >
             {products.map((product) => (
-              <Box key={product._id} sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Box
+                key={product._id}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  height: '100%', // para que la tarjeta se adapte al grid
+                }}
+              >
                 <ProductCard product={product} />
               </Box>
             ))}
