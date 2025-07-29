@@ -77,9 +77,7 @@ const ShippingScreen = () => {
       const user = JSON.parse(localStorage.getItem('user'))
       const token = user?.token
 
-      console.log('👉 Enviando a backend:', formData) // 👈 IMPORTANTE para debug
-      console.log('🌐 PATCHing to:', API.defaults.baseURL + '/users/profile')
-      console.log('📤 Payload a enviar:', formData)
+      // console.log('👉 Enviando a backend:', formData) // 👈 IMPORTANTE para debug
 
       await API.patch('/api/users/profile', formData, {
         headers: {
