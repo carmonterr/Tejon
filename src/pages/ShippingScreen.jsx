@@ -78,8 +78,10 @@ const ShippingScreen = () => {
       const token = user?.token
 
       console.log('👉 Enviando a backend:', formData) // 👈 IMPORTANTE para debug
+      console.log('🌐 PATCHing to:', API.defaults.baseURL + '/users/profile')
+      console.log('📤 Payload a enviar:', formData)
 
-      await API.patch('users/profile', formData, {
+      await API.patch('/api/users/profile', formData, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
