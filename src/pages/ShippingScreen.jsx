@@ -79,7 +79,7 @@ const ShippingScreen = () => {
 
       console.log('👉 Enviando a backend:', formData) // 👈 IMPORTANTE para debug
 
-      await API.patch('/api/users/profile', formData, {
+      await API.patch('users/profile', formData, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
