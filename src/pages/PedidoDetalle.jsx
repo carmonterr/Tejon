@@ -87,7 +87,7 @@ const PedidoDetalle = () => {
       <ComprobantePedido pedido={pedido} user={user} />
 
       <Box textAlign="center">
-        <Button variant="outlined" component={Link} to="/admin/orders" sx={{ mt: 3 }}>
+        <Button variant="outlined" component={Link} to="/mis-pedidos" sx={{ mt: 3 }}>
           ← Volver a la lista
         </Button>
       </Box>
