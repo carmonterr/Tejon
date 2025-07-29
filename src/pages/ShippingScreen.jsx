@@ -30,7 +30,7 @@ const ShippingScreen = () => {
         const user = JSON.parse(localStorage.getItem('user'))
         const token = user?.token
 
-        const { data } = await API.get('/api/users/profile', {
+        const { data } = await API.get('api/users/profile', {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -79,7 +79,7 @@ const ShippingScreen = () => {
 
       console.log('👉 Enviando a backend:', formData) // 👈 IMPORTANTE para debug
 
-      await API.patch('/api/users/profile', formData, {
+      await API.patch('api/users/profile', formData, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -124,7 +124,7 @@ const ShippingScreen = () => {
 
     try {
       await API.post(
-        '/api/orders',
+        'api/orders',
         {
           orderItems,
           shippingPrice: 0,
