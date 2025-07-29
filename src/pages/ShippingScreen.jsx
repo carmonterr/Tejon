@@ -30,7 +30,7 @@ const ShippingScreen = () => {
         const user = JSON.parse(localStorage.getItem('user'))
         const token = user?.token
 
-        const { data } = await API.get('/users/profile', {
+        const { data } = await API.get('profile', {
           headers: { Authorization: `Bearer ${token}` },
         })
 
