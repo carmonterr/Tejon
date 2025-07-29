@@ -187,7 +187,7 @@ const ProductPage = () => {
       <Box sx={{ mb: 3 }}>
         <Button
           variant="contained"
-          color="secondary"
+          color="primary"
           component={Link}
           to="/"
           startIcon={<ArrowBackIosNewIcon />}
