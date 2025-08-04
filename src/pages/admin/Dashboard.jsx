@@ -149,6 +149,15 @@ const Dashboard = () => {
           </Grid>
         ))}
       </Grid>
+      <Grid container spacing={3} columns={12} sx={{ mt: 2 }}>
+        <Grid item xs={12}>
+          <Box textAlign="center">
+            <Button variant="outlined" component={Link} to="/">
+              ← Salir
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
     </Box>
   )
 }

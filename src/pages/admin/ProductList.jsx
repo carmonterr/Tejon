@@ -230,6 +230,11 @@ const ProductList = () => {
         }}
         rowsPerPageOptions={[5, 10, 20]}
       />
+      <Box textAlign="center">
+        <Button variant="outlined" component={Link} to="/admin">
+          ← Volver a Dashboard
+        </Button>
+      </Box>
     </Box>
   )
 }

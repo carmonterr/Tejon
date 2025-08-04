@@ -138,7 +138,7 @@ const Header = () => {
                   transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                 >
                   {user.isAdmin && (
-                    <MenuItem component={Link} to="/admin/products" onClick={handleCloseMenu}>
+                    <MenuItem component={Link} to="/admin" onClick={handleCloseMenu}>
                       Adm. Productos
                     </MenuItem>
                   )}

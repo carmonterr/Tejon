@@ -67,16 +67,24 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   // ✅ Eliminar imágenes principales
   for (const img of product.imagen) {
     if (img.public_id) {
-      console.log('🗑 Eliminando imagen del producto:', img.public_id)
-      await cloudinary.uploader.destroy(img.public_id)
+      try {
+        console.log('🗑 Eliminando imagen del producto:', img.public_id)
+        await cloudinary.uploader.destroy(img.public_id)
+      } catch (err) {
+        console.error('⛔ Error eliminando imagen de producto:', err)
+      }
     }
   }
 
   // ✅ Eliminar imágenes de opiniones
   for (const opinion of product.opiniones) {
     if (opinion.imagen?.public_id) {
-      console.log('🗑 Eliminando imagen de opinión:', opinion.imagen.public_id)
-      await cloudinary.uploader.destroy(opinion.imagen.public_id)
+      try {
+        console.log('🗑 Eliminando imagen de opinión:', opinion.imagen.public_id)
+        await cloudinary.uploader.destroy(opinion.imagen.public_id)
+      } catch (err) {
+        console.error('⛔ Error eliminando imagen de opinión:', err)
+      }
     }
   }
 

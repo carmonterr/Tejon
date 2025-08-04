@@ -15,7 +15,7 @@ import {
   Grid,
 } from '@mui/material'
 
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { uploadImage } from '../../utils/uploadImage'
 import api from '../../utils/axios'
 
@@ -257,6 +257,11 @@ const ProductForm = () => {
           </Grid>
         </Grid>
       </form>
+      <Box textAlign="center">
+        <Button variant="outlined" component={Link} to="/admin">
+          ← Volver a Dashboard
+        </Button>
+      </Box>
     </Box>
   )
 }
