@@ -2,6 +2,7 @@ import Banner from '../models/Banner.js'
 import ApiError from '../utils/ApiError.js'
 import asyncHandler from '../utils/asyncHandler.js'
 import cloudinary from '../utils/cloudinary.js'
+import mongoose from 'mongoose'
 
 // ✅ Crear nuevo banner
 export const createBanner = asyncHandler(async (req, res) => {
@@ -30,22 +31,34 @@ export const getBanners = asyncHandler(async (req, res) => {
 
 // ✅ Eliminar un banner
 export const deleteBanner = asyncHandler(async (req, res) => {
-  const banner = await Banner.findById(req.params.id)
+  const { id } = req.params
+
+  // Validar ID de Mongo
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError('ID de banner inválido', 400, 'INVALID_ID')
+  }
+
+  const banner = await Banner.findById(id)
 
   if (!banner) {
     throw new ApiError('Banner no encontrado', 404, 'BANNER_NOT_FOUND')
   }
 
-  // Eliminar imagen de Cloudinary
+  // Intentar eliminar imagen de Cloudinary si tiene public_id
   if (banner.image?.public_id) {
-    await cloudinary.uploader.destroy(banner.image.public_id)
+    try {
+      await cloudinary.v2.uploader.destroy(banner.image.public_id)
+    } catch (err) {
+      console.error('❌ Error al eliminar imagen de Cloudinary:', err.message)
+      // Puedes decidir continuar o lanzar error
+      // throw new ApiError('Error al eliminar imagen de Cloudinary', 500)
+    }
   }
 
   await banner.deleteOne()
 
   res.json({ message: '🗑️ Banner eliminado correctamente' })
 })
-
 export const updateBanner = asyncHandler(async (req, res) => {
   const { title, description, link, order, image } = req.body
   const banner = await Banner.findById(req.params.id)
