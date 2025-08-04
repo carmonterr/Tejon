@@ -69,9 +69,10 @@ export const deleteProduct = asyncHandler(async (req, res) => {
     if (img.public_id) {
       try {
         console.log('🗑 Eliminando imagen del producto:', img.public_id)
-        await cloudinary.uploader.destroy(img.public_id)
+        const result = await cloudinary.uploader.destroy(img.public_id)
+        console.log('✅ Resultado eliminación:', result)
       } catch (err) {
-        console.error('⛔ Error eliminando imagen de producto:', err)
+        console.error('⛔ Error eliminando imagen de producto:', err.message || err)
       }
     }
   }
@@ -81,9 +82,10 @@ export const deleteProduct = asyncHandler(async (req, res) => {
     if (opinion.imagen?.public_id) {
       try {
         console.log('🗑 Eliminando imagen de opinión:', opinion.imagen.public_id)
-        await cloudinary.uploader.destroy(opinion.imagen.public_id)
+        const result = await cloudinary.uploader.destroy(opinion.imagen.public_id)
+        console.log('✅ Resultado eliminación (opinión):', result)
       } catch (err) {
-        console.error('⛔ Error eliminando imagen de opinión:', err)
+        console.error('⛔ Error eliminando imagen de opinión:', err.message || err)
       }
     }
   }
