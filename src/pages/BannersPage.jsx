@@ -1,28 +1,29 @@
-import React, { useEffect, useState, useRef } from 'react'
 import {
   Box,
-  Typography,
-  TextField,
   Button,
-  Paper,
-  Grid,
   CircularProgress,
+  Chip,
+  Grid,
   IconButton,
   List,
   ListItem,
-  ListItemText,
   ListItemSecondaryAction,
+  ListItemText,
+  Paper,
+  TextField,
   Tooltip,
-  Chip,
+  Typography,
 } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
-import EditIcon from '@mui/icons-material/Edit'
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import {
+  ArrowBackIosNew as ArrowBackIosNewIcon,
+  ArrowForwardIos as ArrowForwardIosIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
-
-import API from '../api/axios' // ✅ API en lugar de axios
-import { uploadImage } from '../utils/uploadImage'
+import API from '../api/axios'
+import { uploadToCloudinary } from '../utils/cloudinaryUpload' // ✅ NUEVO
 
 const BannersPage = () => {
   const [banners, setBanners] = useState([])
@@ -39,13 +40,15 @@ const BannersPage = () => {
   const [editingId, setEditingId] = useState(null)
   const fileInputRef = useRef(null)
 
+  const token = localStorage.getItem('token') // ✅ TOKEN desde el login
+
   useEffect(() => {
     fetchBanners()
   }, [])
 
   const fetchBanners = async () => {
     try {
-      const res = await API.get('api/banners') // ✅ URL correcta: /api/banners → ya agregada en baseURL
+      const res = await API.get('api/banners')
       const sorted = res.data.sort((a, b) => a.order - b.order)
       setBanners(sorted)
     } catch (err) {
@@ -82,7 +85,8 @@ const BannersPage = () => {
       let imageData = null
 
       if (file) {
-        imageData = await uploadImage(file)
+        // ✅ Subida segura a Cloudinary
+        imageData = await uploadToCloudinary(file, token)
       }
 
       const payload = {
@@ -91,10 +95,18 @@ const BannersPage = () => {
       }
 
       if (editingId) {
-        await API.put(`api/banners/${editingId}`, payload)
+        await API.put(`api/banners/${editingId}`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
         toast.success('✅ Banner actualizado')
       } else {
-        await API.post('api/banners', { ...payload, image: imageData })
+        await API.post(
+          'api/banners',
+          { ...payload, image: imageData },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
         toast.success('✅ Banner creado')
       }
 
@@ -125,7 +137,9 @@ const BannersPage = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('¿Eliminar este banner?')) return
     try {
-      await API.delete(`api/banners/${id}`)
+      await API.delete(`api/banners/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       toast.success('🗑 Banner eliminado')
       fetchBanners()
     } catch (err) {

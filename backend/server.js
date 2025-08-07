@@ -9,6 +9,7 @@ import adminRoutes from './routes/adminRoutes.js'
 import { errorHandler } from './middleware/errorHandler.js'
 import { scheduleUserCleanup } from './cron/cleanUnverifiedUsers.js'
 import bannerRoutes from './routes/bannerRoutes.js'
+import cloudinaryRoutes from './routes/cloudinaryRoutes.js'
 
 connectDB()
 
@@ -26,11 +27,13 @@ app.use(
 
 app.use(express.json())
 
+app.use('/api/cloudinary', cloudinaryRoutes)
 app.use('/api/products', productRoutes)
 app.use('/api/users', userRoutes)
 
 app.use('/api/orders', orderRoutes)
 app.use('/api/admin', adminRoutes)
+
 //app.use('/api/admin', getOrderSummary)
 //.use('/api/admin', getVentasPorFecha)
 
