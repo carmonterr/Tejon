@@ -4,6 +4,14 @@ export const generateCloudinarySignature = (req, res) => {
   const timestamp = Math.floor(Date.now() / 1000)
   const folder = 'banners'
 
+  console.log({
+    timestamp,
+    folder,
+    api_key: process.env.CLOUDINARY_KEY,
+    cloud_name: process.env.CLOUDINARY_NAME,
+    secret: process.env.CLOUDINARY_SECRET ? 'OK' : 'MISSING',
+  })
+
   const signature = cloudinary.utils.api_sign_request(
     { timestamp, folder },
     process.env.CLOUDINARY_SECRET // ✅ nombre correcto
