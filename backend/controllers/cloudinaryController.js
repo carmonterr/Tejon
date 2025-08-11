@@ -5,11 +5,12 @@ export const generateCloudinarySignature = (req, res) => {
   const folder = 'banners'
 
   console.log({
+    from: 'generateCloudinarySignature',
     timestamp,
     folder,
     api_key: process.env.CLOUDINARY_KEY,
     cloud_name: process.env.CLOUDINARY_NAME,
-    secret: process.env.CLOUDINARY_SECRET ? 'OK' : 'MISSING',
+    secretExists: !!process.env.CLOUDINARY_SECRET,
   })
 
   const signature = cloudinary.utils.api_sign_request(
