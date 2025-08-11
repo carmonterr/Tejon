@@ -10,6 +10,7 @@ import { errorHandler } from './middleware/errorHandler.js'
 import { scheduleUserCleanup } from './cron/cleanUnverifiedUsers.js'
 import bannerRoutes from './routes/bannerRoutes.js'
 import cloudinaryRoutes from './routes/cloudinaryRoutes.js'
+import logger from './utils/logger.js'
 
 connectDB()
 
@@ -26,6 +27,8 @@ app.use(
 )
 
 app.use(express.json())
+
+// Aquí puedes hacer pruebas de logging
 
 app.use('/api/cloudinary', cloudinaryRoutes)
 app.use('/api/products', productRoutes)
@@ -48,5 +51,5 @@ if (process.env.NODE_ENV === 'production') {
 const PORT = process.env.PORT || 5000
 
 app.listen(process.env.PORT, () => {
-  console.log(`🚀 Servidor corriendo en puerto ${PORT}`)
+  logger.info(`🚀 Servidor corriendo en puerto ${PORT}`)
 })
