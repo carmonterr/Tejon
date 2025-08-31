@@ -9,16 +9,9 @@ export const uploadToCloudinary = async (file, token) => {
     }
   )
 
-  const { timestamp, signature, api_key, cloud_name, folder } = sigRes.data
+  console.log('🛠️ Respuesta del backend para firma:', sigRes.data)
 
-  // 🔍 debug log antes de subir
-  console.log('🔍 FormData que se enviará a Cloudinary:', {
-    file: file.name,
-    api_key,
-    timestamp,
-    signature,
-    folder,
-  })
+  const { timestamp, signature, api_key, cloud_name, folder } = sigRes.data
 
   const formData = new FormData()
   formData.append('file', file)
@@ -27,19 +20,22 @@ export const uploadToCloudinary = async (file, token) => {
   formData.append('signature', signature)
   formData.append('folder', folder)
 
+  console.log('📤 Enviando a Cloudinary:', {
+    timestamp,
+    signature,
+    folder,
+    api_key,
+  })
+
   const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, {
     method: 'POST',
     body: formData,
   })
 
   const data = await res.json()
-
   if (!res.ok || !data.secure_url) {
-    console.error('❌ Error desde Cloudinary:', data)
     throw new Error(data.error?.message || 'Error al subir imagen')
   }
-
-  console.log('✅ Imagen subida con éxito:', data)
 
   return {
     public_id: data.public_id,
