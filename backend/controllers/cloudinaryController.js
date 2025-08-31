@@ -1,28 +1,26 @@
 import { v2 as cloudinary } from 'cloudinary'
 
-export const generateCloudinarySignature = (req, res, next) => {
+export const generateCloudinarySignature = (req, res) => {
   try {
-    // ⏱ Generamos timestamp fresco
     const timestamp = Math.floor(Date.now() / 1000)
-
-    // 📂 Carpeta destino
     const folder = 'banners'
 
-    // ✍️ Firma
+    // ✅ generar firma
     const signature = cloudinary.utils.api_sign_request(
       { timestamp, folder },
       process.env.CLOUDINARY_SECRET
     )
 
-    // 🔍 Log (puedes quitarlo en prod)
-    console.log('Signature endpoint:', {
+    // 🔍 debug log
+    console.log('📝 Firma generada en backend:', {
       stringToSign: `folder=${folder}&timestamp=${timestamp}`,
       signature,
       timestamp,
-      isoTime: new Date(timestamp * 1000).toISOString(),
+      cloudName: process.env.CLOUDINARY_NAME,
+      apiKey: process.env.CLOUDINARY_KEY,
+      secretExists: !!process.env.CLOUDINARY_SECRET,
     })
 
-    // 📤 Respuesta al frontend
     res.json({
       timestamp,
       signature,
@@ -31,27 +29,7 @@ export const generateCloudinarySignature = (req, res, next) => {
       cloud_name: process.env.CLOUDINARY_NAME,
     })
   } catch (err) {
-    // 🔄 Delega al middleware de errores
-    next(err)
+    console.error('❌ Error generando firma:', err)
+    res.status(500).json({ message: 'Error generando firma' })
   }
 }
-
-// import { v2 as cloudinary } from 'cloudinary'
-
-// export const generateCloudinarySignature = (req, res) => {
-//   const timestamp = Math.floor(Date.now() / 1000)
-//   const folder = 'banners'
-
-//   const signature = cloudinary.utils.api_sign_request(
-//     { timestamp, folder },
-//     process.env.CLOUDINARY_SECRET
-//   )
-
-//   res.json({
-//     timestamp,
-//     signature,
-//     folder,
-//     api_key: process.env.CLOUDINARY_KEY,
-//     cloud_name: process.env.CLOUDINARY_NAME,
-//   })
-// }

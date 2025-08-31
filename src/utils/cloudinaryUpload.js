@@ -11,6 +11,15 @@ export const uploadToCloudinary = async (file, token) => {
 
   const { timestamp, signature, api_key, cloud_name, folder } = sigRes.data
 
+  // 🔍 debug log antes de subir
+  console.log('🔍 FormData que se enviará a Cloudinary:', {
+    file: file.name,
+    api_key,
+    timestamp,
+    signature,
+    folder,
+  })
+
   const formData = new FormData()
   formData.append('file', file)
   formData.append('api_key', api_key)
@@ -26,8 +35,11 @@ export const uploadToCloudinary = async (file, token) => {
   const data = await res.json()
 
   if (!res.ok || !data.secure_url) {
+    console.error('❌ Error desde Cloudinary:', data)
     throw new Error(data.error?.message || 'Error al subir imagen')
   }
+
+  console.log('✅ Imagen subida con éxito:', data)
 
   return {
     public_id: data.public_id,
